@@ -1,4 +1,4 @@
-package hcloud
+package openbsd-vmm
 
 import (
 	"fmt"

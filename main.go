@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"github.com/hashicorp/packer/packer/plugin"
-	vmm "builder/openbsd-vmm"
+	vmm "./builder/openbsd-vmm"
 )
 
 func main() {
