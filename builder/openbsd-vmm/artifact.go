@@ -1,4 +1,4 @@
-package openbsd-vmm
+package openbsdvmm
 
 import "fmt"
 
