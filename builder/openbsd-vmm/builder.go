@@ -2,7 +2,7 @@ package openbsdvmm
 
 import (
 	"fmt"
-	"os/exec"
+//	"os/exec"
 	"path/filepath"
 
 	"github.com/hashicorp/packer/common"
@@ -32,6 +32,9 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 
 	var errs *packer.MultiError
 	errs = packer.MultiErrorAppend(errs, b.config.Comm.Prepare(&b.config.ctx)...)
+        errs = packer.MultiErrorAppend(errs, b.config.HTTPConfig.Prepare(&b.config.ctx)...)
+        warnings, isoErrs := b.config.ISOConfig.Prepare(&b.config.ctx)
+
 	if b.config.VMName == "" {
 		b.config.VMName = "packer-" + b.config.PackerBuildName
 	}
@@ -69,11 +72,12 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 	}
 	// XXX: DNS
 
+        errs = packer.MultiErrorAppend(errs, isoErrs...)
 	if len(errs.Errors) > 0 {
 		return nil, errors.New(errs.Error())
 	}
 
-	return nil, nil
+	return warnings, nil
 }
 
 func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packer.Artifact, error) {
@@ -115,6 +119,20 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 	}
 
 	return artifact, nil
+}
+
+func (b *Builder) newDriver(ui packer.Ui) (vmmDriver, error) {
+	// XXX: check doas.conf basics/existance
+	doasbin := "/usr/bin/doas"
+	// XXX: check VMD capable (see vagrant-openbsd-driver)
+	vmctlbin := "/usr/sbin/vmctl"
+        log := filepath.Join(b.config.OutDir, b.config.VMName + ".log")
+        return vmmDriver {
+		doas: doasbin,
+		logfile: log,
+		vmctl: vmctlbin,
+		ui: ui,
+	}, nil
 }
 
 func (b *Builder) Cancel() {
