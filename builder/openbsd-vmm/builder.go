@@ -6,8 +6,8 @@ import (
 	"github.com/hashicorp/packer/common"
 	"github.com/hashicorp/packer/helper/communicator"
 	"github.com/hashicorp/packer/helper/config"
+	"github.com/hashicorp/packer/helper/multistep"
 	"github.com/hashicorp/packer/packer"
-	"github.com/mitchellh/multistep"
 	"github.com/pkg/errors"
 )
 
@@ -47,24 +47,24 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 
 	state := new(multistep.BasicStateBag)
 	state.Put("config", b.config)
-	state.Put("client", client)
+	//state.Put("client", client)
 	state.Put("hook", hook)
 	state.Put("ui", ui)
 
 	steps := []multistep.Step{
-		&stepCreateSSHKey{},
-		new(stepCreateServer),
-		new(stepWaitForServer),
+		//&stepCreateSSHKey{},
+		//new(stepCreateServer),
+		//new(stepWaitForServer),
 		&communicator.StepConnect{
 			Config:    &b.config.Comm,
-			Host:      commHost,
-			SSHConfig: sshConfig,
+			//Host:      commHost,
+			//SSHConfig: sshConfig,
 		},
 		new(common.StepProvision),
-		new(stepShutdown),
-		new(stepPowerOff),
-		new(stepCaptureImage),
-		new(stepWaitForImage),
+		//new(stepShutdown),
+		//new(stepPowerOff),
+		//new(stepCaptureImage),
+		//new(stepWaitForImage),
 	}
 
 	b.runner = common.NewRunner(steps, b.config.PackerConfig, ui)
