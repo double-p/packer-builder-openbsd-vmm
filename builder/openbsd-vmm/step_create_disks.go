@@ -26,7 +26,8 @@ func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) 
 		"create",
 		//step.format + ":" + path,
 		path,
-		"-s " + step.size,
+		"-s",
+		step.size,
 	}
 	ui.Say("Creating disk images...")
 	if err := driver.VmctlCmd(usedoas, command...); err != nil {

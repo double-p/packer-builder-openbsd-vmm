@@ -19,7 +19,7 @@ type stepLaunchVM struct {
 
 func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	driver := state.Get("driver").(Driver)
-	var usedoas bool = false;
+	var usedoas bool = true;
 	ui := state.Get("ui").(packer.Ui)
 	path := filepath.Join(step.outputPath, step.image)
 
@@ -27,10 +27,14 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		"start",
 		step.name,
 		"-L",
-		"-i 1",
-		"-m " + step.mem,
-		"-b " + step.kernel,
-		"-d /home/pbuehler/devel/packer-builder-openbsd-vmm/" + path,
+		"-i",
+		"1",
+		"-m",
+		step.mem,
+		"-b",
+		step.kernel,
+		"-d",
+		"/home/pbuehler/devel/packer-builder-openbsd-vmm/" + path,
 	}
 	ui.Say("Bring up VM...")
 	if err := driver.VmctlCmd(usedoas, command...); err != nil {
