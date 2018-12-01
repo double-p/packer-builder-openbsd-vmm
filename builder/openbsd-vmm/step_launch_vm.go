@@ -26,7 +26,8 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 	command := []string{
 		"start",
 		step.name,
-		"-L -i 1",
+		"-L",
+		"-i 1",
 		"-m " + step.mem,
 		"-d " + path,
 		"-b " + step.kernel,
