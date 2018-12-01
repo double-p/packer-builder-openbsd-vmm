@@ -1,12 +1,12 @@
 package openbsdvmm
 
 import (
-	"fmt"
-//	"os/exec"
+	//"fmt"
+	//"os/exec"
 	"path/filepath"
 
-	"github.com/hashicorp/packer/common"
-	"github.com/hashicorp/packer/helper/communicator"
+	//"github.com/hashicorp/packer/common"
+	//"github.com/hashicorp/packer/helper/communicator"
 	"github.com/hashicorp/packer/helper/config"
 	"github.com/hashicorp/packer/helper/multistep"
 	"github.com/hashicorp/packer/packer"
@@ -80,45 +80,25 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 	return warnings, nil
 }
 
+// direct the workflow of creating the resulting artficat into "steppers"
 func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packer.Artifact, error) {
-	//client := openbsd-vmm.NewClient(openbsd-vmm.WithToken(b.config.Token))
-
-	state := new(multistep.BasicStateBag)
-	state.Put("config", b.config)
-	//state.Put("client", client)
-	state.Put("hook", hook)
-	state.Put("ui", ui)
-
-	steps := []multistep.Step{
-		//&stepCreateSSHKey{},
-		//new(stepCreateServer),
-		//new(stepWaitForServer),
-		&communicator.StepConnect{
-			Config:    &b.config.Comm,
-			//Host:      commHost,
-			//SSHConfig: sshConfig,
-		},
-		new(common.StepProvision),
-		//new(stepShutdown),
-		//new(stepPowerOff),
-		//new(stepCaptureImage),
-		//new(stepWaitForImage),
-	}
-
-	b.runner = common.NewRunner(steps, b.config.PackerConfig, ui)
-	b.runner.Run(state)
-
-	if rawErr, ok := state.GetOk("error"); ok {
-		ui.Error(fmt.Sprintf("Got state error: %s", rawErr.(error)))
-		return nil, rawErr.(error)
-	}
-
-	artifact := &Artifact{
-		imageID:   state.Get("image_id").(int),
-		imageName: state.Get("image_name").(string),
-	}
-
-	return artifact, nil
+/*
+ instanciate driver
+ steps:
+ output init
+ multistep collector array
+ iso handling config
+ empty disk config
+ init internal http (autoinstall)
+ bring in VM definition
+ bootcommand/autoinstall
+ statebag?!
+ runner steps above
+ postfact err handling
+ cast Artifact (wat?)
+ return artifact
+*/
+	return nil, nil
 }
 
 func (b *Builder) newDriver(ui packer.Ui) (vmmDriver, error) {
