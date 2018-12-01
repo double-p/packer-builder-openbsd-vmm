@@ -29,6 +29,7 @@ func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
 		log.Printf("Executing doas: %#v", args)
 		cmd = exec.Command(d.doas, args...)
 	} else {
+		args = append([]string{"ktrace"}, args...)
 		log.Printf("Executing vmctl: %#v", args)
 		cmd = exec.Command(d.vmctl, args...)
 	}
