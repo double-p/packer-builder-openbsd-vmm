@@ -48,7 +48,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 		b.config.DiskSize = "5G"
 	}
 	switch b.config.DiskFormat {
-	case "raw,qcow2":
+	case "raw","qcow2":
 		// valid, use as is
 	case "":
 		b.config.DiskFormat = "raw"
