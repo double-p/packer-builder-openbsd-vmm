@@ -14,7 +14,7 @@ type Config struct {
 
 	VMName      string `mapstructure:"vm_name"`
 	Console     bool   `mapstructure:"console"` // attach a console (to debug)
-	SourceImage string `mapstructure:"source_image"` //installNN.fs
+	BootImage   string `mapstructure:"boot_image"` //installNN.fs
 	ImageName   string `mapstructure:"image_name"`  // artifact from build
 	DiskSize    string `mapstructure:"disk_size"` // as vmctl -s
 	DiskFormat  string `mapstructure:"disk_format"` // as vmctl create

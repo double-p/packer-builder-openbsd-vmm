@@ -38,8 +38,8 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 	if b.config.VMName == "" {
 		b.config.VMName = "packer-" + b.config.PackerBuildName
 	}
-	if b.config.SourceImage == "" {
-		errs = packer.MultiErrorAppend(errs, errors.New("Missing source_image name"))
+	if b.config.BootImage == "" {
+		b.config.BootImage = "/bsd.rd"
 	}
 	if b.config.ImageName == "" {
 		b.config.ImageName = "image-" + b.config.PackerBuildName
@@ -102,6 +102,14 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 		image:      b.config.ImageName,
 		format:     b.config.DiskFormat,
 		size:       b.config.DiskSize,
+	})
+
+	steps = append(steps, &stepLaunchVM{
+		outputPath: b.config.OutDir,
+		image:      b.config.ImageName,
+		name:       b.config.VMName,
+		mem:        b.config.RAMSize,
+		kernel:     b.config.BootImage,
 	})
 
 	state := new(multistep.BasicStateBag)

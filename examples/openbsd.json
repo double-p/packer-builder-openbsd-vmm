@@ -8,7 +8,7 @@
       "disk_format": "raw",
       "output_directory": "tempbuilds",
       "image_name": "OpenBSD-VMM-image",
-      "source_image": "file:///Users/pbuehler/install64.fs",
+      "boot_image": "/bsd.rd",
       "iso_url": "file:///Users/pbuehler/Software/ISOs/install58.iso",
       "iso_checksum": "90d1c29ea5c2d6db1a37ac84b02da57c085aee3c1e285eb64831d82ace20c4ee",
       "iso_checksum_type": "sha256",
