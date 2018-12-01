@@ -92,6 +92,12 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
  multistep collector array
  iso handling config
  empty disk config
+*/
+	steps = append(steps, &stepOutDir{
+		outputPath: b.config.OutDir,
+		force:      b.config.PackerForce,
+	})
+/*
  init internal http (autoinstall)
  bring in VM definition
  bootcommand/autoinstall
@@ -116,6 +122,7 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
  return artifact
 */
 	artifact.imageName = b.config.ImageName //faking artifact step
+	artifact.imageSize = 123456321 //faking artifact step
 	return artifact, nil
 }
 

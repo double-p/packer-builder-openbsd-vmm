@@ -6,6 +6,7 @@
       "name": "packer-obsd64-vmm-amd64",
       "disk_size": "2G",
       "disk_format": "raw",
+      "output_directory": "builds",
       "image_name": "OpenBSD-VMM-image",
       "source_image": "file:///Users/pbuehler/install64.fs",
       "iso_url": "file:///Users/pbuehler/Software/ISOs/install58.iso",
