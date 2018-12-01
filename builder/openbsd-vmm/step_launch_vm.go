@@ -19,7 +19,7 @@ type stepLaunchVM struct {
 
 func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	driver := state.Get("driver").(Driver)
-	var usedoas bool = true;
+	var usedoas bool = false;
 	ui := state.Get("ui").(packer.Ui)
 	path := filepath.Join(step.outputPath, step.image)
 
