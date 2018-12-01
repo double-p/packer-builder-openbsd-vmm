@@ -24,8 +24,8 @@ func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
         var stdout, stderr bytes.Buffer
 	var cmd *exec.Cmd
 	if usedoas {
-		log.Printf("Executing doas vmctl: %#v", args)
 		args = append([]string{d.vmctl}, args...)
+		log.Printf("Executing doas: %#v", args)
 		cmd = exec.Command(d.doas, args...)
 	} else {
 		log.Printf("Executing vmctl: %#v", args)
