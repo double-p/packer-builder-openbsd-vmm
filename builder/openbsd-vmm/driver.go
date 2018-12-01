@@ -47,3 +47,10 @@ func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
 	log.Printf("stderr: %s", stderrString)
 	return err
 }
+
+func (driver *vmmDriver) Stop(name string) error {
+	args := []string(d.vmctl, "stop", name)
+	cmd := exec.Command(d.doas, args...)
+	err := cmd.Run()
+	return err
+}

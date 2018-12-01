@@ -37,7 +37,7 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		"-d",
 		"/home/pbuehler/devel/packer-builder-openbsd-vmm/" + path,
 	}
-	ui.Say("Bring up VM...")
+	ui.Say("Bringing up VM...")
 	if err := driver.VmctlCmd(usedoas, command...); err != nil {
 		err := fmt.Errorf("Error bringing VM up: %s", err)
 		state.Put("error", err)
@@ -51,4 +51,6 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 }
 
 func (step *stepLaunchVM) Cleanup(state multistep.StateBag) {
+	//driver := state.Get("driver").(Driver)
+	//driver.Stop(step.vmName)
 }
