@@ -100,7 +100,7 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 	state.Put("hook", hook)
 	state.Put("ui", ui)
 
-	// Run; step-wise if PACKER_DEBUG=1
+	// Run; step-wise if -debug/-on-error=ask
 	b.runner = common.NewRunner(steps, b.config.PackerConfig, ui)
 	if b.config.PackerDebug {
 		b.runner = common.NewRunnerWithPauseFn(steps, b.config.PackerConfig, ui, state) 
