@@ -1,0 +1,26 @@
+{
+  "builders": [
+    {
+      "type": "openbsd-vmm",
+      "name": "packer-obsd64-vmm-amd64",
+      "disk_size": 5120,
+      "source_image": "file:///Users/pbuehler/install64.fs",
+      "iso_url": "file:///Users/pbuehler/Software/ISOs/install58.iso",
+      "iso_checksum": "90d1c29ea5c2d6db1a37ac84b02da57c085aee3c1e285eb64831d82ace20c4ee",
+      "iso_checksum_type": "sha256",
+      "ssh_username": "root",
+      "ssh_password": "vagrant"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "environment_vars": [
+         "PKG_PATH=http://artfiles.org/openbsd/snapshots/packages/amd64/"
+      ],
+      "inline": "pkg_add -Iz sudo-1.8"
+    }
+  ],
+  "post-processors": ["vagrant"]
+}
+
