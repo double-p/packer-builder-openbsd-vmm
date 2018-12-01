@@ -9,12 +9,14 @@ import (
 type VmmArtifact struct {
 	imageName string
 	imageID   int
+	imageSize int
 }
 
 func (*VmmArtifact) BuilderId() string {
 	return BuilderID
 }
 
+// who needs this?
 func (a *VmmArtifact) Files() []string {
 	return append([]string{a.imageName}, "nuts\n")
 }
@@ -24,7 +26,7 @@ func (a *VmmArtifact) Id() string {
 }
 
 func (a *VmmArtifact) String() string {
-	return fmt.Sprintf("%d (%s)\n", a.imageID, a.imageName)
+	return fmt.Sprintf("%s (Size %d)\n", a.imageName, a.imageSize)
 }
 
 func (a *VmmArtifact) State(name string) interface{} {
