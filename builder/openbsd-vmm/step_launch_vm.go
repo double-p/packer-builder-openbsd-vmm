@@ -29,7 +29,7 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		"-L",
 		"-i 1",
 		"-m " + step.mem,
-		"-d ./" + path,
+		"-d /home/pbuehler/devel/packer-builder-openbsd-vmm" + path,
 		"-b " + step.kernel,
 	}
 	ui.Say("Bring up VM...")
