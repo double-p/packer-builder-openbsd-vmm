@@ -1,9 +1,11 @@
 package openbsdvmm
 
 import (
+	"bytes"
 	"log"
 	"os/exec"
 	"fmt"
+	"strings"
 //	"github.com/hashicorp/packer/packer"
 )
 
@@ -19,6 +21,7 @@ type vmmDriver struct {
 }
 
 func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
+        var stdout, stderr bytes.Buffer
 	var cmd *exec.Cmd
 	if usedoas {
 		log.Printf("Executing doas vmctl: %#v", args)
@@ -28,9 +31,16 @@ func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
 		log.Printf("Executing vmctl: %#v", args)
 		cmd = exec.Command(d.vmctl, args...)
 	}
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 	err := cmd.Run()
+	stdoutString := strings.TrimSpace(stdout.String())
+	stderrString := strings.TrimSpace(stderr.String())
+
 	if _, ok := err.(*exec.ExitError); ok {
 		err = fmt.Errorf("vmctl error")
 	}
+	log.Printf("stdout: %s", stdoutString)
+	log.Printf("stderr: %s", stderrString)
 	return err
 }
