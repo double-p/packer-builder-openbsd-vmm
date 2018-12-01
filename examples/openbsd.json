@@ -4,7 +4,7 @@
       "type": "openbsd-vmm",
       "vm_name": "VMnameinput",
       "name": "packer-obsd64-vmm-amd64",
-      "disk_size": "2G",
+      "disk_size": "1500",
       "disk_format": "raw",
       "output_directory": "builds",
       "image_name": "OpenBSD-VMM-image",

@@ -85,27 +85,27 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 
 // direct the workflow of creating the resulting artficat into "steppers"
 func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packer.Artifact, error) {
+	driver, err := b.newDriver()
+	if err != nil {
+		return nil, fmt.Errorf("Failed creating VMM driver: %s", err)
+	}
 	artifact := new(VmmArtifact)
-/*
- instanciate driver
- steps:
-*/
 	steps := []multistep.Step{}
-/*
- multistep collector array
- iso handling config
- empty disk config
-*/
+
 	steps = append(steps, &stepOutDir{
 		outputPath: b.config.OutDir,
 		force:      b.config.PackerForce,
 	})
-/*
- init internal http (autoinstall)
- bring in VM definition
- bootcommand/autoinstall
-*/
+
+	steps = append(steps, &stepCreateDisks{
+		outputPath: b.config.OutDir,
+		image:      b.config.ImageName,
+		format:     b.config.DiskFormat,
+		size:       b.config.DiskSize,
+	})
+
 	state := new(multistep.BasicStateBag)
+	state.Put("driver", driver)
 	state.Put("config", b.config)
 	state.Put("hook", hook)
 	state.Put("ui", ui)
@@ -120,27 +120,24 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 	if rawErr, ok := state.GetOk("error"); ok {
 		return nil, rawErr.(error)
 	}
-/*
- cast Artifact (wat?)
- return artifact
-*/
+
 	artifact.imageName = b.config.ImageName //faking artifact step
 	artifact.imageSize = 123456321 //faking artifact step
 	return artifact, nil
 }
 
-func (b *Builder) newDriver(ui packer.Ui) (vmmDriver, error) {
+func (b *Builder) newDriver() (Driver, error) {
 	// XXX: check doas.conf basics/existance
 	doasbin := "/usr/bin/doas"
 	// XXX: check VMD capable (see vagrant-openbsd-driver)
 	vmctlbin := "/usr/sbin/vmctl"
         log := filepath.Join(b.config.OutDir, b.config.VMName + ".log")
-        return vmmDriver {
+        driver :=  &vmmDriver {
 		doas: doasbin,
 		logfile: log,
 		vmctl: vmctlbin,
-		ui: ui,
-	}, nil
+	}
+	return driver, nil
 }
 
 func (b *Builder) Cancel() {
