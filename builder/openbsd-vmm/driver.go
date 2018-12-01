@@ -35,5 +35,4 @@ func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
 	//if _, ok := err.(*exec.ExitError); ok {
 		//err = fmt.Errorf("vmctl error")
 	//}
-	return nil
 }
