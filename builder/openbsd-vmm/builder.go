@@ -82,6 +82,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 
 // direct the workflow of creating the resulting artficat into "steppers"
 func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packer.Artifact, error) {
+	artifact := new(VmmArtifact)
 /*
  instanciate driver
  steps:
@@ -114,7 +115,8 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
  cast Artifact (wat?)
  return artifact
 */
-	return nil, nil
+	artifact.imageName = b.config.ImageName //faking artifact step
+	return artifact, nil
 }
 
 func (b *Builder) newDriver(ui packer.Ui) (vmmDriver, error) {

@@ -11,16 +11,5 @@
       "ssh_username": "root",
       "ssh_password": "vagrant"
     }
-  ],
-  "provisioners": [
-    {
-      "type": "shell",
-      "environment_vars": [
-         "PKG_PATH=http://artfiles.org/openbsd/snapshots/packages/amd64/"
-      ],
-      "inline": "pkg_add -Iz sudo-1.8"
-    }
-  ],
-  "post-processors": ["vagrant"]
+  ]
 }
-
