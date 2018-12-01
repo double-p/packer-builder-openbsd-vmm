@@ -5,7 +5,7 @@ import (
 	//"os/exec"
 	"path/filepath"
 
-	//"github.com/hashicorp/packer/common"
+	"github.com/hashicorp/packer/common"
 	//"github.com/hashicorp/packer/helper/communicator"
 	"github.com/hashicorp/packer/helper/config"
 	"github.com/hashicorp/packer/helper/multistep"
@@ -85,16 +85,30 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 /*
  instanciate driver
  steps:
- output init
+*/
+	steps := []multistep.Step{}
+/*
  multistep collector array
  iso handling config
  empty disk config
  init internal http (autoinstall)
  bring in VM definition
  bootcommand/autoinstall
- statebag?!
- runner steps above
- postfact err handling
+*/
+	state := new(multistep.BasicStateBag)
+	state.Put("config", b.config)
+	state.Put("hook", hook)
+	state.Put("ui", ui)
+
+	// Run!
+	//b.runner = common.NewRunner(steps, b.config.PackerConfig, ui) //regular
+	b.runner = common.NewRunnerWithPauseFn(steps, b.config.PackerConfig, ui, state) //stepdebug
+	b.runner.Run(state)
+
+	if rawErr, ok := state.GetOk("error"); ok {
+		return nil, rawErr.(error)
+	}
+/*
  cast Artifact (wat?)
  return artifact
 */
