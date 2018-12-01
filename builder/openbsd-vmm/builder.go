@@ -1,7 +1,7 @@
 package openbsdvmm
 
 import (
-	//"fmt"
+	"fmt"
 	//"os/exec"
 	"path/filepath"
 
@@ -43,6 +43,9 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 	}
 	if b.config.ImageName == "" {
 		b.config.ImageName = "image-" + b.config.PackerBuildName
+	}
+	if b.config.OutDir == "" {
+		b.config.OutDir = fmt.Sprintf("output-%s", b.config.PackerBuildName)
 	}
 	if b.config.DiskSize == "" {
 		b.config.DiskSize = "5G"
