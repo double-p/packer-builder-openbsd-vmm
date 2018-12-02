@@ -3,17 +3,20 @@ package openbsdvmm
 import (
 	"bytes"
 	"log"
+	"os"
 	"os/exec"
 	"fmt"
 	"io"
 	"strings"
+	"time"
 	"github.com/hashicorp/packer/common/bootcommand"
-//	"github.com/hashicorp/packer/packer"
+	"github.com/hashicorp/packer/packer"
 )
 
 type Driver interface {
 	bootcommand.BCDriver
 	VmctlCmd(bool, ...string) error
+	Start(...string) error
 	//Flush() error
 }
 
@@ -23,6 +26,7 @@ type vmmDriver struct {
 	logfile	 string
 	tty      io.WriteCloser
 	console  int
+	ui       packer.Ui
 }
 
 func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
@@ -51,6 +55,46 @@ func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
 	log.Printf("stdout: %s", stdoutString)
 	log.Printf("stderr: %s", stderrString)
 	return err
+}
+
+// Start the VM and create a pipe to insert commands into the VM. (from packer-builder-vmm)
+func (d *vmmDriver) Start(args ...string) error {
+	d.ui.Message("Logging console output to " + d.logfile)
+	logFile, err := os.Create(d.logfile)
+	if err != nil {
+		return err
+	}
+
+	args = append([]string{d.vmctl}, args...)
+	d.ui.Message("Executing " + d.doas + " " + strings.Join(args, " "))
+
+	cmd := exec.Command(d.doas, args...)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+
+	// Create an stdin pipe that is used to issue commands.
+	if d.tty, err = cmd.StdinPipe(); err != nil {
+		return err
+	}
+
+	// Write the console output to the log file.
+	go func() {
+		defer stdout.Close()
+		defer logFile.Close()
+
+		_, _ = io.Copy(logFile, stdout)
+	}()
+
+	// Start up the VM.
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	// Give the VM a bit of time to start up.
+	time.Sleep(3 * time.Second)
+	return nil
 }
 
 func (d *vmmDriver) Stop(name string) error {
