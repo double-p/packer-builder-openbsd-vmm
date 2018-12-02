@@ -59,7 +59,7 @@ func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
 
 // Start the VM and create a pipe to insert commands into the VM. (from packer-builder-vmm)
 func (d *vmmDriver) Start(args ...string) error {
-	d.ui.Message("Logging console output to " + d.logfile)
+	//d.ui.Message("Logging console output to " + d.logfile)
 	logFile, err := os.Create(d.logfile)
 	if err != nil {
 		return err
