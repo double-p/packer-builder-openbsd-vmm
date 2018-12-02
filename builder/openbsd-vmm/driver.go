@@ -5,19 +5,24 @@ import (
 	"log"
 	"os/exec"
 	"fmt"
+	"io"
 	"strings"
+	"github.com/hashicorp/packer/common/bootcommand"
 //	"github.com/hashicorp/packer/packer"
 )
 
 type Driver interface {
+	bootcommand.BCDriver
 	VmctlCmd(bool, ...string) error
+	//Flush() error
 }
 
 type vmmDriver struct {
-	doas string
-	vmctl string
-	logfile	string
-	console int
+	doas     string
+	vmctl    string
+	logfile	 string
+	tty      io.WriteCloser
+	console  int
 }
 
 func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
@@ -53,3 +58,34 @@ func (d *vmmDriver) Stop(name string) error {
 	err := cmd.Run()
 	return err
 }
+
+//// interface Seq requires the following, not using it so far
+// SendKey sends a key press.
+func (d *vmmDriver) SendKey(key rune, action bootcommand.KeyAction) error {
+	data := []byte{byte(key)}
+
+	_, err := d.tty.Write(data)
+	return err
+}
+
+// SendSpecial sends a special character.
+func (d *vmmDriver) SendSpecial(special string, action bootcommand.KeyAction) error {
+	var data []byte
+
+	switch special {
+	case "enter":
+		data = []byte("\n")
+	}
+
+	if len(data) != 0 {
+		if _, err := d.tty.Write(data); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+func (driver *vmmDriver) Flush() error {
+	return nil
+}
+

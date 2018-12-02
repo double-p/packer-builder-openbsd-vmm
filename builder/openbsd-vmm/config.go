@@ -3,13 +3,15 @@ package openbsdvmm
 import (
 	"github.com/hashicorp/packer/common"
 	"github.com/hashicorp/packer/helper/communicator"
+	"github.com/hashicorp/packer/common/bootcommand"
 	"github.com/hashicorp/packer/template/interpolate"
 )
 
 type Config struct {
-	common.PackerConfig `mapstructure:",squash"`
-	common.HTTPConfig   `mapstructure:",squash"`
-	common.ISOConfig    `mapstructure:",squash"`
+	common.PackerConfig    `mapstructure:",squash"`
+	common.HTTPConfig      `mapstructure:",squash"`
+	common.ISOConfig       `mapstructure:",squash"`
+	bootcommand.BootConfig `mapstructure:",squash"`
 	Comm                communicator.Config `mapstructure:",squash"`
 
 	VMName      string `mapstructure:"vm_name"`

@@ -9,11 +9,10 @@
       "output_directory": "tempbuilds",
       "image_name": "OpenBSD-VMM-image",
       "boot_image": "/bsd.rd",
-      "iso_url": "file:///Users/pbuehler/Software/ISOs/install58.iso",
-      "iso_checksum": "90d1c29ea5c2d6db1a37ac84b02da57c085aee3c1e285eb64831d82ace20c4ee",
-      "iso_checksum_type": "sha256",
-      "ssh_username": "root",
-      "ssh_password": "vagrant"
+      "boot_command": [
+        "S<enter>"
+      ],
+      "boot_wait": "5s"
     }
   ]
 }

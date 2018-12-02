@@ -112,6 +112,12 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 		kernel:     b.config.BootImage,
 	})
 
+	steps = append(steps, &stepBootCmd{
+		wait:       b.config.BootWait,
+		cmd:        b.config.FlatBootCommand(),
+		ctx:        b.config.ctx,
+	})
+
 	state := new(multistep.BasicStateBag)
 	state.Put("driver", driver)
 	state.Put("config", b.config)
