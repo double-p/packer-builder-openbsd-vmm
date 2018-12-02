@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/packer/helper/config"
 	"github.com/hashicorp/packer/helper/multistep"
 	"github.com/hashicorp/packer/packer"
+	"github.com/hashicorp/packer/template/interpolate"
 	"github.com/pkg/errors"
 )
 
@@ -24,6 +25,11 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 	err := config.Decode(&b.config, &config.DecodeOpts{
 		Interpolate:        true,
 		InterpolateContext: &b.config.ctx,
+			InterpolateFilter: &interpolate.RenderFilter{
+			Exclude: []string{
+				"boot_command",
+			},
+		},
 	}, raws...)
 
 	if err != nil {
