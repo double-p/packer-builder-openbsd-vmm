@@ -151,7 +151,7 @@ func (b *Builder) newDriver() (Driver, error) {
 	doasbin := "/usr/bin/doas"
 	// XXX: check VMD capable (see vagrant-openbsd-driver)
 	vmctlbin := "/usr/sbin/vmctl"
-        log := filepath.Join(b.config.OutDir, b.config.VMName + ".log")
+        log := filepath.Join(b.config.OutDir + "/../" , b.config.VMName + ".log")
         driver :=  &vmmDriver {
 		doas: doasbin,
 		logfile: log,

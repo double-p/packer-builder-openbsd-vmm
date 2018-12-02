@@ -9,10 +9,12 @@
       "output_directory": "tempbuilds",
       "image_name": "OpenBSD-VMM-image",
       "boot_image": "/bsd.rd",
-      "boot_command": [
-        "S<enter>"
-      ],
       "boot_wait": "5s",
+      "boot_command": [
+        "S<enter>",
+        "# HELLO HACK4GLARUS<enter>",
+        "dhclient vio0<enter>"
+      ],
       "ssh_username": "root",
       "iso_url": "file:///Users/pbuehler/Software/ISOs/install59.iso",
       "iso_checksum": "685262fc665425c61a2952b2820389a2d331ac5558217080e6d564d2ce88eecb",
