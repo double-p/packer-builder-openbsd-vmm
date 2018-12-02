@@ -66,7 +66,7 @@ func (d *vmmDriver) Start(args ...string) error {
 	}
 
 	args = append([]string{d.vmctl}, args...)
-	d.ui.Message("Executing " + d.doas + " " + strings.Join(args, " "))
+	//d.ui.Message("Executing " + d.doas + " " + strings.Join(args, " "))
 
 	cmd := exec.Command(d.doas, args...)
 	stdout, err := cmd.StdoutPipe()
