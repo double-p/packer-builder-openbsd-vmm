@@ -1,6 +1,7 @@
 package openbsdvmm
 
 import (
+	"time"
 	"github.com/hashicorp/packer/common"
 	"github.com/hashicorp/packer/helper/communicator"
 	"github.com/hashicorp/packer/common/bootcommand"
@@ -13,6 +14,8 @@ type Config struct {
 	common.ISOConfig       `mapstructure:",squash"`
 	bootcommand.BootConfig `mapstructure:",squash"`
 	Comm                communicator.Config `mapstructure:",squash"`
+	RawBootWait        string `mapstructure:"boot_wait"`
+	bootWait        time.Duration ``
 
 	VMName      string `mapstructure:"vm_name"`
 	Console     bool   `mapstructure:"console"` // attach a console (to debug)

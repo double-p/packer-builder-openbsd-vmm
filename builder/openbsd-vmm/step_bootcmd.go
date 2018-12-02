@@ -12,25 +12,19 @@ import (
 )
 
 type stepBootCmd struct {
-	wait   time.Duration
 	cmd    string
 	ctx    interpolate.Context
 }
 
 func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
+	config := state.Get("config").(*Config)
 	driver := state.Get("driver").(Driver)
 	ui := state.Get("ui").(packer.Ui)
 
-	if step.wait > 0 {
-		ui.Say(fmt.Sprintf("Waiting %s for boot...", step.wait.String()))
-		select {
-		case <-time.After(step.wait):
-			break
-		case <-ctx.Done():
-			return multistep.ActionHalt
-		}
+	ui.Say(fmt.Sprintf("boot_wait is (%s).", config.bootWait.String()))
+	if int64(config.bootWait) > 0 {
+		time.Sleep(time.Duration(config.bootWait) * time.Second)
 	}
-
 	ui.Say("Typing the boot command...")
 	command, err := interpolate.Render(step.cmd, &step.ctx)
 	if err != nil {
@@ -48,6 +42,8 @@ func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) mult
 		state.Put("error", fmt.Errorf("Error running boot command: %s", err))
 		return multistep.ActionHalt
 	}
+	ui.Say("Waiting 15s for bootcommand to finish...") //XXX debug
+	time.Sleep(15 * time.Second)
 	return multistep.ActionContinue
 }
 

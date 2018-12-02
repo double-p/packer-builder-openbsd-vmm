@@ -2,7 +2,7 @@ package openbsdvmm
 
 import (
 	"fmt"
-	//"os/exec"
+	"time"
 	"path/filepath"
 
 	"github.com/hashicorp/packer/common"
@@ -80,6 +80,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 		// "is ip6"?
 	}
 	// XXX: DNS
+	b.config.bootWait, err = time.ParseDuration(b.config.RawBootWait)
 
         errs = packer.MultiErrorAppend(errs, isoErrs...)
 	if len(errs.Errors) > 0 {
@@ -119,14 +120,13 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 	})
 
 	steps = append(steps, &stepBootCmd{
-		wait:       b.config.BootWait,
 		cmd:        b.config.FlatBootCommand(),
 		ctx:        b.config.ctx,
 	})
 
 	state := new(multistep.BasicStateBag)
 	state.Put("driver", driver)
-	state.Put("config", b.config)
+	state.Put("config", &b.config)
 	state.Put("hook", hook)
 	state.Put("ui", ui)
 
