@@ -23,7 +23,7 @@ func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) mult
 
 	ui.Say(fmt.Sprintf("boot_wait is (%s).", config.bootWait.String()))
 	if int64(config.bootWait) > 0 {
-		time.Sleep(time.Duration(config.bootWait) * time.Second)
+		time.Sleep(time.Duration(config.bootWait))
 	}
 	ui.Say("Typing the boot command...")
 	command, err := interpolate.Render(step.cmd, &step.ctx)
