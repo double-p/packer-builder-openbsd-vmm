@@ -14,7 +14,7 @@
       "boot_command": [
         "S<enter>",
         "# HELLO AsiaBSDCon<enter>",
-        "dhclient vio0<enter>"
+        "dhclient vio0<enter>",
         "ftp -o install.conf http://{{ .HTTPIP }}:{{ .HTTPPort }}/<enter>"
       ],
       "ssh_username": "root",
