@@ -13,9 +13,9 @@
       "boot_wait": "5s",
       "boot_command": [
         "S<enter>",
-        "# HELLO HACK4GLARUS<enter>",
+        "# HELLO AsiaBSDCon<enter>",
         "dhclient vio0<enter>"
-        "ftp -o install.conf http://{{ .HTTPIP }}:{{ .HTTPPort }}/"
+        "ftp -o install.conf http://{{ .HTTPIP }}:{{ .HTTPPort }}/<enter>"
       ],
       "ssh_username": "root",
       "iso_url": "file:///Users/pbuehler/Software/ISOs/install59.iso",

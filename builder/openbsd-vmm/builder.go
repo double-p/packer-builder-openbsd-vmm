@@ -119,6 +119,12 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 		kernel:     b.config.BootImage,
 	})
 
+        steps = append(steps, &common.StepHTTPServer{
+                HTTPDir:     b.config.HTTPDir,
+                HTTPPortMin: b.config.HTTPPortMin,
+                HTTPPortMax: b.config.HTTPPortMax,
+        })
+
 	steps = append(steps, &stepBootCmd{
 		cmd:        b.config.FlatBootCommand(),
 		ctx:        b.config.ctx,

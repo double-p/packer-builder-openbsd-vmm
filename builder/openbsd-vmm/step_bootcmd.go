@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hashicorp/packer/common"
 	"github.com/hashicorp/packer/common/bootcommand"
 	"github.com/hashicorp/packer/packer"
 	"github.com/hashicorp/packer/helper/multistep"
@@ -16,10 +17,24 @@ type stepBootCmd struct {
 	ctx    interpolate.Context
 }
 
+type bootCommandTemplateData struct {
+        HTTPIP   string
+        HTTPPort uint
+}
+
 func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	config := state.Get("config").(*Config)
 	driver := state.Get("driver").(Driver)
 	ui := state.Get("ui").(packer.Ui)
+	httpPort := state.Get("http_port").(uint)
+
+        hostIp := "100.64.123.22"
+        ui.Say(fmt.Sprintf("Host HTTPD on %s:%d", hostIp, httpPort))
+        common.SetHTTPIP(hostIp)
+        step.ctx.Data = &bootCommandTemplateData{
+                hostIp,
+                httpPort,
+        }
 
 	ui.Say(fmt.Sprintf("boot_wait is (%s).", config.bootWait.String()))
 	if int64(config.bootWait) > 0 {
