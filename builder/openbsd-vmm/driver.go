@@ -2,13 +2,14 @@ package openbsdvmm
 
 import (
 	"bytes"
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
-	"fmt"
-	"io"
 	"strings"
 	"time"
+
 	"github.com/hashicorp/packer/common/bootcommand"
 	"github.com/hashicorp/packer/packer"
 )
@@ -21,16 +22,16 @@ type Driver interface {
 }
 
 type vmmDriver struct {
-	doas     string
-	vmctl    string
-	logfile	 string
-	tty      io.WriteCloser
-	console  int
-	ui       packer.Ui
+	doas    string
+	vmctl   string
+	logfile string
+	tty     io.WriteCloser
+	console int
+	ui      packer.Ui
 }
 
 func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
-        var stdout, stderr bytes.Buffer
+	var stdout, stderr bytes.Buffer
 	var cmd *exec.Cmd
 	if usedoas {
 		args = append([]string{d.vmctl}, args...)
@@ -132,4 +133,3 @@ func (d *vmmDriver) SendSpecial(special string, action bootcommand.KeyAction) er
 func (driver *vmmDriver) Flush() error {
 	return nil
 }
-

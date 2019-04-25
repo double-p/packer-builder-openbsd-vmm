@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/hashicorp/packer/packer"
 	"github.com/hashicorp/packer/helper/multistep"
+	"github.com/hashicorp/packer/packer"
 )
 
 type stepLaunchVM struct {
 	outputPath string
-	image  string
-	name   string
-	mem    string
-	kernel string
+	image      string
+	name       string
+	mem        string
+	kernel     string
 }
 
 func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {

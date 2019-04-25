@@ -2,8 +2,9 @@ package main
 
 import (
 	"log"
+
+	vmm "github.com/double-p/packer-builder-openbsd-vmm/builder/openbsd-vmm"
 	"github.com/hashicorp/packer/packer/plugin"
-	vmm "./builder/openbsd-vmm"
 )
 
 func main() {
