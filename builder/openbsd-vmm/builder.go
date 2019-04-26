@@ -1,9 +1,10 @@
 package openbsdvmm
 
 import (
+	"context"
 	"fmt"
-	"time"
 	"path/filepath"
+	"time"
 
 	"github.com/hashicorp/packer/common"
 	//"github.com/hashicorp/packer/helper/communicator"
@@ -25,7 +26,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 	err := config.Decode(&b.config, &config.DecodeOpts{
 		Interpolate:        true,
 		InterpolateContext: &b.config.ctx,
-			InterpolateFilter: &interpolate.RenderFilter{
+		InterpolateFilter: &interpolate.RenderFilter{
 			Exclude: []string{
 				"boot_command",
 			},
@@ -38,8 +39,8 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 
 	var errs *packer.MultiError
 	errs = packer.MultiErrorAppend(errs, b.config.Comm.Prepare(&b.config.ctx)...)
-        errs = packer.MultiErrorAppend(errs, b.config.HTTPConfig.Prepare(&b.config.ctx)...)
-        warnings, isoErrs := b.config.ISOConfig.Prepare(&b.config.ctx)
+	errs = packer.MultiErrorAppend(errs, b.config.HTTPConfig.Prepare(&b.config.ctx)...)
+	warnings, isoErrs := b.config.ISOConfig.Prepare(&b.config.ctx)
 
 	if b.config.VMName == "" {
 		b.config.VMName = "packer-" + b.config.PackerBuildName
@@ -57,7 +58,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 		b.config.DiskSize = "5G"
 	}
 	switch b.config.DiskFormat {
-	case "raw","qcow2":
+	case "raw", "qcow2":
 		// valid, use as is
 	case "":
 		b.config.DiskFormat = "raw"
@@ -82,7 +83,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 	// XXX: DNS
 	b.config.bootWait, err = time.ParseDuration(b.config.RawBootWait)
 
-        errs = packer.MultiErrorAppend(errs, isoErrs...)
+	errs = packer.MultiErrorAppend(errs, isoErrs...)
 	if len(errs.Errors) > 0 {
 		return nil, errors.New(errs.Error())
 	}
@@ -91,7 +92,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 }
 
 // direct the workflow of creating the resulting artficat into "steppers"
-func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packer.Artifact, error) {
+func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (packer.Artifact, error) {
 	driver, err := b.newDriver()
 	if err != nil {
 		return nil, fmt.Errorf("Failed creating VMM driver: %s", err)
@@ -119,15 +120,15 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 		kernel:     b.config.BootImage,
 	})
 
-        steps = append(steps, &common.StepHTTPServer{
-                HTTPDir:     b.config.HTTPDir,
-                HTTPPortMin: b.config.HTTPPortMin,
-                HTTPPortMax: b.config.HTTPPortMax,
-        })
+	steps = append(steps, &common.StepHTTPServer{
+		HTTPDir:     b.config.HTTPDir,
+		HTTPPortMin: b.config.HTTPPortMin,
+		HTTPPortMax: b.config.HTTPPortMax,
+	})
 
 	steps = append(steps, &stepBootCmd{
-		cmd:        b.config.FlatBootCommand(),
-		ctx:        b.config.ctx,
+		cmd: b.config.FlatBootCommand(),
+		ctx: b.config.ctx,
 	})
 
 	state := new(multistep.BasicStateBag)
@@ -139,16 +140,16 @@ func (b *Builder) Run(ui packer.Ui, hook packer.Hook, cache packer.Cache) (packe
 	// Run; step-wise if -debug/-on-error=ask
 	b.runner = common.NewRunner(steps, b.config.PackerConfig, ui)
 	if b.config.PackerDebug {
-		b.runner = common.NewRunnerWithPauseFn(steps, b.config.PackerConfig, ui, state) 
+		b.runner = common.NewRunnerWithPauseFn(steps, b.config.PackerConfig, ui, state)
 	}
-	b.runner.Run(state)
+	b.runner.Run(context.Background(), state)
 
 	if rawErr, ok := state.GetOk("error"); ok {
 		return nil, rawErr.(error)
 	}
 
 	artifact.imageName = b.config.ImageName //faking artifact step
-	artifact.imageSize = 123456321 //faking artifact step
+	artifact.imageSize = 123456321          //faking artifact step
 	return artifact, nil
 }
 
@@ -157,17 +158,11 @@ func (b *Builder) newDriver() (Driver, error) {
 	doasbin := "/usr/bin/doas"
 	// XXX: check VMD capable (see vagrant-openbsd-driver)
 	vmctlbin := "/usr/sbin/vmctl"
-        log := filepath.Join(b.config.OutDir + "/../" , b.config.VMName + ".log")
-        driver :=  &vmmDriver {
-		doas: doasbin,
+	log := filepath.Join(b.config.OutDir+"/../", b.config.VMName+".log")
+	driver := &vmmDriver{
+		doas:    doasbin,
 		logfile: log,
-		vmctl: vmctlbin,
+		vmctl:   vmctlbin,
 	}
 	return driver, nil
-}
-
-func (b *Builder) Cancel() {
-	if b.runner != nil {
-		b.runner.Cancel()
-	}
 }

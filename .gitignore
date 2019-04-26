@@ -8,3 +8,5 @@ testbuild
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+packer-builder-openbsd-vmm

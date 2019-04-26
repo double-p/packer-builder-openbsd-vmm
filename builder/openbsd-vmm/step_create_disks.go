@@ -5,20 +5,20 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/hashicorp/packer/packer"
 	"github.com/hashicorp/packer/helper/multistep"
+	"github.com/hashicorp/packer/packer"
 )
 
 type stepCreateDisks struct {
 	outputPath string
-	image string
-	format string
-	size string
+	image      string
+	format     string
+	size       string
 }
 
 func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	driver := state.Get("driver").(Driver)
-	var usedoas bool = false;
+	var usedoas bool = false
 	ui := state.Get("ui").(packer.Ui)
 	path := filepath.Join(step.outputPath, step.image)
 
