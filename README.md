@@ -10,7 +10,6 @@ go build -o ~/.packer.d/plugins/packer-builder-openbsd-vmm
 packer build examples/openbsd.json
 packer build -var-file=examples/config.json examples/openbsd.json
 ```
-(OpenBSD isnt on 1.11 yet, so no go.mod)
 
 # Example template
 
