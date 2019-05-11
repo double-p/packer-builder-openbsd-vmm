@@ -1,17 +1,15 @@
 # packer-builder-openbsd-vmm
 [Packer](https://packer.io/) builder plugin for OpenBSD's VMM
 
-# Building
+## jumpstart
 ```
-go get github.com/hashicorp/packer/packer/plugin
-go get github.com/pkg/errors
-mkdir -p ~/.packer.d/plugins/
-go build -o ~/.packer.d/plugins/packer-builder-openbsd-vmm
+make install
 packer build examples/openbsd.json
 packer build -var-file=examples/config.json examples/openbsd.json
 ```
+More details in BUILD.md
 
-# Example template
+## Example template
 
 ```
 {
