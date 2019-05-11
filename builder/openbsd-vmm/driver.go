@@ -18,7 +18,7 @@ type Driver interface {
 	bootcommand.BCDriver
 	VmctlCmd(bool, ...string) error
 	Start(...string) error
-        GetTapIPAddress(string) (string, error)
+	GetTapIPAddress(string) (string, error)
 	//Flush() error
 }
 
