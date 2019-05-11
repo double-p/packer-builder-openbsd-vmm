@@ -6,7 +6,8 @@ all: build
 build:
 	@go build
 
-install:
+install: build
+	@mkdir -p ~/.packer.d/plugins/
 	@go build -o ~/.packer.d/plugins/packer-builder-openbsd-vmm
 
 fmt:
@@ -20,3 +21,7 @@ test:
 
 clean:
 	@rm -f packer-builder-openbsd-vmm
+
+uninstall: clean
+	@rm -f ~/.packer.d/plugins/packer-builder-openbsd-vmm
+
