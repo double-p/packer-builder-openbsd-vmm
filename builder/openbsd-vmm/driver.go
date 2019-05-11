@@ -18,6 +18,7 @@ type Driver interface {
 	bootcommand.BCDriver
 	VmctlCmd(bool, ...string) error
 	Start(...string) error
+        GetTapIPAddress(string) (string, error)
 	//Flush() error
 }
 
@@ -102,6 +103,10 @@ func (d *vmmDriver) Stop(name string) error {
 	cmd := exec.Command(d.doas, d.vmctl, "stop", name)
 	err := cmd.Run()
 	return err
+}
+
+func (d *vmmDriver) GetTapIPAddress(vmname string) (string, error) {
+	return "127.0.0.2", nil
 }
 
 //// interface Seq requires the following, not using it so far

@@ -28,13 +28,13 @@ func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) mult
 	ui := state.Get("ui").(packer.Ui)
 	httpPort := state.Get("http_port").(uint)
 
-	hostIp := "100.64.123.22"
-	ui.Say(fmt.Sprintf("Host HTTPD on %s:%d", hostIp, httpPort))
-	common.SetHTTPIP(hostIp)
-	step.ctx.Data = &bootCommandTemplateData{
-		hostIp,
-		httpPort,
-	}
+        hostIp, err := driver.GetTapIPAddress(config.VMName)
+        ui.Say(fmt.Sprintf("%s with Host HTTPD on %s:%d", config.VMName, hostIp, httpPort))
+        common.SetHTTPIP(hostIp)
+        step.ctx.Data = &bootCommandTemplateData{
+                hostIp,
+                httpPort,
+        }
 
 	ui.Say(fmt.Sprintf("boot_wait is (%s).", config.bootWait.String()))
 	if int64(config.bootWait) > 0 {
