@@ -1,5 +1,5 @@
-SRC_FILES=$(shell find . -type f -name '*.go')
-PKG=$(shell go list ./... )
+SRC_FILES != /usr/bin/find . -type f -name '*.go'
+PKG != /usr/local/bin/go list ./...
 
 all: build
 
@@ -11,7 +11,7 @@ install: build
 	@go build -o ~/.packer.d/plugins/packer-builder-openbsd-vmm
 
 fmt:
-	@gofmt -e -l -s $(SRC_FILES) |grep ".*" && exit 2 || exit 0
+	@gofmt -e -l -s $(SRC_FILES) | grep "go" && echo "gofmt -s -d on above" || exit 0
 
 vet:
 	@go vet -all $(PKG)
