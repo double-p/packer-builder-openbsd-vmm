@@ -27,6 +27,8 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		step.name,
 		"-c",
 		"-L",
+		"-B",
+		"net",
 		"-i",
 		"1",
 		"-m",
@@ -34,7 +36,7 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		"-b",
 		step.kernel,
 		"-d",
-		"/home/pbuehler/devel/packer-builder-openbsd-vmm/" + path,
+		"/home/pbuehler/packer-builder-openbsd-vmm/" + path,
 	}
 	ui.Say("Bringing up VM...")
 	if err := driver.Start(command...); err != nil {
