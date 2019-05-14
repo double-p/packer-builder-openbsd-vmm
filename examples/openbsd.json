@@ -12,7 +12,8 @@
       "boot_image": "/bsd.rd",
       "boot_wait": "5s",
       "boot_command": [
-        "A<enter>"
+        "A<enter>",
+        "http://{{ .HTTPIP }}:{{ .HTTPPort }}/packer-auto_install.conf<enter>"
       ],
       "ssh_username": "root",
       "iso_url": "file:///Users/pbuehler/Software/ISOs/install59.iso",
