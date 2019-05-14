@@ -8,11 +8,14 @@
       "disk_format": "raw",
       "output_directory": "tempbuilds",
       "image_name": "OpenBSD-VMM-image",
-      "http_directory": "./docroot",
+      "http_directory": ".",
       "boot_image": "/bsd.rd",
       "boot_wait": "5s",
       "boot_command": [
-        "A<enter>"
+        "S<enter>",
+        "# HELLO AsiaBSDCon<enter>",
+        "dhclient vio0<enter>",
+        "ftp -o install.conf http://{{ .HTTPIP }}:{{ .HTTPPort }}/<enter>"
       ],
       "ssh_username": "root",
       "iso_url": "file:///Users/pbuehler/Software/ISOs/install59.iso",
