@@ -106,7 +106,7 @@ func (d *vmmDriver) Stop(name string) error {
 }
 
 func (d *vmmDriver) GetTapIPAddress(vmname string) (string, error) {
-	return "127.0.0.2", nil
+	return "100.64.1.2", nil
 }
 
 //// interface Seq requires the following, not using it so far
