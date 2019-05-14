@@ -19,14 +19,14 @@ type stepBootCmd struct {
 
 type bootCommandTemplateData struct {
 	HTTPIP   string
-	HTTPPort uint
+	HTTPPort int
 }
 
 func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	config := state.Get("config").(*Config)
 	driver := state.Get("driver").(Driver)
 	ui := state.Get("ui").(packer.Ui)
-	httpPort := state.Get("http_port").(uint)
+	httpPort := state.Get("http_port").(int)
 
 	hostIp, err := driver.GetTapIPAddress(config.VMName)
 	ui.Say(fmt.Sprintf("%s with Host HTTPD on %s:%d", config.VMName, hostIp, httpPort))
