@@ -19,6 +19,9 @@ vet:
 test:
 	@go test -v -timeout 60s $(PKG)
 
+vmb:
+	@PACKER_LOG=1 packer build examples/openbsd.json
+
 clean:
 	@rm -f packer-builder-openbsd-vmm
 
