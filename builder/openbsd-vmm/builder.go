@@ -97,7 +97,7 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 	if err != nil {
 		return nil, fmt.Errorf("Failed creating VMM driver: %s", err)
 	}
-	artifact := new(VmmArtifact)
+
 	steps := []multistep.Step{}
 
 	steps = append(steps, &stepOutDir{
@@ -148,8 +148,10 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 		return nil, rawErr.(error)
 	}
 
-	artifact.imageName = b.config.ImageName //faking artifact step
-	artifact.imageSize = 123456321          //faking artifact step
+	artifact := &VmmArtifact{
+		imageDir: 	b.config.OutDir,
+		imageName:	b.config.ImageName,
+	}
 	return artifact, nil
 }
 

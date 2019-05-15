@@ -8,8 +8,7 @@ import (
 
 type VmmArtifact struct {
 	imageName string
-	imageID   int
-	imageSize int
+	imageDir string
 }
 
 func (*VmmArtifact) BuilderId() string {
@@ -22,11 +21,11 @@ func (a *VmmArtifact) Files() []string {
 }
 
 func (a *VmmArtifact) Id() string {
-	return fmt.Sprintf("%d", a.imageID)
+	return "one"
 }
 
 func (a *VmmArtifact) String() string {
-	return fmt.Sprintf("%s (Size %d)\n", a.imageName, a.imageSize)
+	return fmt.Sprintf("Image: %s\n", a.imageName)
 }
 
 func (a *VmmArtifact) State(name string) interface{} {
