@@ -3,11 +3,11 @@ package openbsdvmm
 import (
 	"fmt"
 	"log"
-	"os"
+//	"os"
 )
 
 type VmmArtifact struct {
-	imageName string
+	imageName []string
 	imageDir string
 }
 
@@ -17,11 +17,11 @@ func (*VmmArtifact) BuilderId() string {
 
 // who needs this?
 func (a *VmmArtifact) Files() []string {
-	return append([]string{a.imageName}, "nuts\n")
+	return a.imageName
 }
 
 func (a *VmmArtifact) Id() string {
-	return "one"
+	return "VMM"
 }
 
 func (a *VmmArtifact) String() string {
@@ -34,5 +34,5 @@ func (a *VmmArtifact) State(name string) interface{} {
 
 func (a VmmArtifact) Destroy() error {
 	log.Printf("Deleting %s", a.imageName)
-	return os.Remove(a.imageName)
+	return nil
 }

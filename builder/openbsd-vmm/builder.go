@@ -150,7 +150,7 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 
 	artifact := &VmmArtifact{
 		imageDir: 	b.config.OutDir,
-		imageName:	b.config.ImageName,
+		imageName:	[]string{b.config.ImageName},
 	}
 	return artifact, nil
 }
