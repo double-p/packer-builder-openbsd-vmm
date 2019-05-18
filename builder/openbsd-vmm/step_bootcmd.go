@@ -57,8 +57,8 @@ func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) mult
 		state.Put("error", fmt.Errorf("Error running boot command: %s", err))
 		return multistep.ActionHalt
 	}
-	ui.Say("Waiting 360s for bootcommand to finish...") //XXX debug
-	time.Sleep(360 * time.Second)
+	ui.Say("Waiting 240 for bootcommand to finish...") //XXX debug
+	time.Sleep(240 * time.Second)
 	return multistep.ActionContinue
 }
 
