@@ -102,8 +102,9 @@ func (d *vmmDriver) Start(args ...string) error {
 
 func (d *vmmDriver) Stop(name string) error {
 	cmd := exec.Command(d.doas, d.vmctl, "stop", name)
-	err := cmd.Run()
-	return err
+	//err := cmd.Run()
+	cmd.Run()
+	return nil
 }
 
 func (d *vmmDriver) GetTapIPAddress(vmname string) (string, error) {
