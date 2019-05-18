@@ -5,7 +5,7 @@
       "name": "packer-obsd64-vmm-amd64",
       "vm_name": "myvm",
       "disk_size": "1500M",
-      "disk_format": "raw",
+      "disk_format": "qcow2",
       "output_directory": "images",
       "http_directory": "./docroot",
       "iso_image": "~/Downloads/install65.iso",
