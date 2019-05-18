@@ -19,6 +19,11 @@ import (
 
 const BuilderID = "packer.openbsd-vmm"
 
+const (
+	_DISK_QCOW2 = "qcow2"
+	_DISK_RAW   = "raw"
+)
+
 type Builder struct {
 	config Config
 	runner multistep.Runner
@@ -53,17 +58,21 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 		b.config.OutDir = fmt.Sprintf("output-%s", b.config.PackerBuildName)
 	}
 
-	if b.config.DiskSize == "" {
-		b.config.DiskSize = "5G"
-	}
+	// DiskSize can be omitted if you're starting from a base image
+	// as it'll use the same size as the base image.
 
 	switch b.config.DiskFormat {
-	case "raw", "qcow2":
+	case _DISK_RAW, _DISK_QCOW2:
 		// valid, use as is
 	case "":
-		b.config.DiskFormat = "raw"
+		b.config.DiskFormat = _DISK_RAW
 	default:
 		errs = packer.MultiErrorAppend(errs, errors.New("Unsupported disk_format name: "+b.config.DiskFormat))
+	}
+
+	if b.config.DiskBase != "" && b.config.DiskFormat != _DISK_QCOW2 {
+		errs = packer.MultiErrorAppend(errs, errors.New(
+			"Cannot specify a base image without using qcow2 disk format"))
 	}
 
 	if b.config.RAMSize == "" {
@@ -109,7 +118,15 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 
 	isoPath, err := homedir.Expand(b.config.IsoImage)
 	if err != nil {
-		return nil, fmt.Errorf("failed expanding iso image: %v", err)
+		return nil, fmt.Errorf("failed expanding iso image path: %v", err)
+	}
+
+	var basePath string
+	if b.config.DiskBase != "" {
+		basePath, err = homedir.Expand(b.config.DiskBase)
+		if err != nil {
+			return nil, fmt.Errorf("failed expanding disk base path: %v", err)
+		}
 	}
 
 	steps := []multistep.Step{}
@@ -124,6 +141,7 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 		outputPath: b.config.OutDir,
 		name:       b.config.PackerBuildName,
 		format:     b.config.DiskFormat,
+		baseImage:  basePath,
 		size:       b.config.DiskSize,
 	})
 

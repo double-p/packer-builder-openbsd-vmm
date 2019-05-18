@@ -23,6 +23,7 @@ type Config struct {
 	IsoImage   string `mapstructure:"iso_image"`
 	DiskSize   string `mapstructure:"disk_size"`   // as vmctl -s
 	DiskFormat string `mapstructure:"disk_format"` // as vmctl create
+	DiskBase   string `mapstructure:"disk_base"`   // for qcow2 only
 	RAMSize    string `mapstructure:"ram_size"`    // as vmctl -m
 	// not everybody lives in autoconf/DHCP; populate for hostname.vi0
 	Inet4   string `mapstructure:"inet4"`       // hostname.if 'inet'

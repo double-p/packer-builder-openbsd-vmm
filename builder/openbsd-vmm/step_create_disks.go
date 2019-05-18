@@ -14,6 +14,7 @@ type stepCreateDisks struct {
 	name       string
 	format     string
 	size       string
+	baseImage  string
 }
 
 func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
@@ -24,11 +25,17 @@ func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) 
 
 	command := []string{
 		"create",
-		//step.format + ":" + path,
-		path,
+		step.format + ":" + path,
 		"-s",
 		step.size,
 	}
+
+	if step.baseImage != "" {
+		command = append(command,
+			"-b",
+			step.baseImage)
+	}
+
 	ui.Say("Creating disk images...")
 	if err := driver.VmctlCmd(usedoas, command...); err != nil {
 		err := fmt.Errorf("Error creating disk image: %s", err)
@@ -38,9 +45,7 @@ func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) 
 	}
 
 	state.Put("disk_image", path)
-
 	return multistep.ActionContinue
 }
 
-func (step *stepCreateDisks) Cleanup(state multistep.StateBag) {
-}
+func (step *stepCreateDisks) Cleanup(state multistep.StateBag) {}
