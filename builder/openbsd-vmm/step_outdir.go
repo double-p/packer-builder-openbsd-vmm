@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/hashicorp/packer/helper/multistep"
 	"github.com/hashicorp/packer/packer"
@@ -11,46 +12,35 @@ import (
 
 type stepOutDir struct {
 	outputPath string
-	cleanup    bool
+	name       string
 	force      bool
 }
 
 func (step *stepOutDir) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
+	ui := state.Get("ui").(packer.Ui)
+
 	// Check if the output directory exists.
-	if _, err := os.Stat(step.outputPath); err == nil {
-		// If the build isn't forced, error out here.
-		if !step.force {
-			state.Put("error", fmt.Errorf("output directory already exists: %s", step.outputPath))
+	if _, err := os.Stat(step.outputPath); !os.IsNotExist(err) {
+		ui.Say("Output directory already exists, skipping")
+	} else {
+		// Create the output directory.
+		if err := os.MkdirAll(step.outputPath, 0755); err != nil {
+			state.Put("error", fmt.Errorf("output %s", step.outputPath))
 			return multistep.ActionHalt
 		}
-
-		// Forced build, so remove the directory.
-		ui := state.Get("ui").(packer.Ui)
-		ui.Say("Deleting previous output directory...")
-		os.RemoveAll(step.outputPath)
 	}
 
-	// Mark that a cleanup is definately needed.
-	step.cleanup = true
-
-	// Create the output directory.
-	if err := os.MkdirAll(step.outputPath, 0755); err != nil {
-		state.Put("error", fmt.Errorf("output %s", step.outputPath))
-		return multistep.ActionHalt
+	// Check if output image exists
+	if _, err := os.Stat(
+		filepath.Join(step.outputPath, step.name)); !os.IsNotExist(err) {
+		// If the build isn't forced, error out here.
+		if !step.force {
+			state.Put("error", fmt.Errorf("image already exists: %s", step.name))
+			return multistep.ActionHalt
+		}
 	}
 
 	return multistep.ActionContinue
 }
 
-func (step *stepOutDir) Cleanup(state multistep.StateBag) {
-	// Skip if no output directory was made in the first place.
-	if !step.cleanup {
-		return
-	}
-
-	ui := state.Get("ui").(packer.Ui)
-	ui.Say("Deleting output directory...")
-	if err := os.RemoveAll(step.outputPath); err != nil {
-		ui.Error("Unable to delete output directory: " + err.Error())
-	}
-}
+func (step *stepOutDir) Cleanup(state multistep.StateBag) {}

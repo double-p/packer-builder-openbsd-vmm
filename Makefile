@@ -24,7 +24,8 @@ vmb:
 
 clean:
 	@rm -f packer-builder-openbsd-vmm
+	@rm -fr images
+	@rm -fr packer_cache
 
 uninstall: clean
 	@rm -f ~/.packer.d/plugins/packer-builder-openbsd-vmm
-

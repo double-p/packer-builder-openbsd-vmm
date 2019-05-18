@@ -2,7 +2,7 @@ packer_*
 *.swp
 *.log
 #
-testbuild
+images
 
 # Test binary, build with `go test -c`
 *.test

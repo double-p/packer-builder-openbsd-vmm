@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/hashicorp/packer/common"
+	"github.com/mitchellh/go-homedir"
+
 	//"github.com/hashicorp/packer/helper/communicator"
 	"github.com/hashicorp/packer/helper/config"
 	"github.com/hashicorp/packer/helper/multistep"
@@ -23,7 +25,7 @@ type Builder struct {
 }
 
 func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
-	err := config.Decode(&b.config, &config.DecodeOpts{
+	if err := config.Decode(&b.config, &config.DecodeOpts{
 		Interpolate:        true,
 		InterpolateContext: &b.config.ctx,
 		InterpolateFilter: &interpolate.RenderFilter{
@@ -31,32 +33,30 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 				"boot_command",
 			},
 		},
-	}, raws...)
-
-	if err != nil {
-		return nil, err
+	}, raws...); err != nil {
+		return nil, fmt.Errorf("decoding config: %v", err)
 	}
 
 	var errs *packer.MultiError
 	errs = packer.MultiErrorAppend(errs, b.config.Comm.Prepare(&b.config.ctx)...)
 	errs = packer.MultiErrorAppend(errs, b.config.HTTPConfig.Prepare(&b.config.ctx)...)
-	warnings, isoErrs := b.config.ISOConfig.Prepare(&b.config.ctx)
 
 	if b.config.VMName == "" {
 		b.config.VMName = "packer-" + b.config.PackerBuildName
 	}
-	if b.config.BootImage == "" {
-		b.config.BootImage = "/bsd.rd"
+
+	if b.config.Bios == "" {
+		b.config.Bios = "/etc/firmware/vmm-bios"
 	}
-	if b.config.ImageName == "" {
-		b.config.ImageName = "image-" + b.config.PackerBuildName
-	}
+
 	if b.config.OutDir == "" {
 		b.config.OutDir = fmt.Sprintf("output-%s", b.config.PackerBuildName)
 	}
+
 	if b.config.DiskSize == "" {
 		b.config.DiskSize = "5G"
 	}
+
 	switch b.config.DiskFormat {
 	case "raw", "qcow2":
 		// valid, use as is
@@ -65,30 +65,39 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 	default:
 		errs = packer.MultiErrorAppend(errs, errors.New("Unsupported disk_format name: "+b.config.DiskFormat))
 	}
+
 	if b.config.RAMSize == "" {
 		b.config.RAMSize = "512M"
 	}
+
 	if b.config.Inet4 == "" {
 		b.config.Inet4 = "dhcp" //XXX: some syntax check isIP4+prefix
 	}
+
 	if b.config.Inet4GW == "" {
 		// "is ip4"?
 	}
+
 	if b.config.Inet6 == "" {
 		b.config.Inet4 = "autoconf" //XXX: some syntax check isIP6+prefix
 	}
+
 	if b.config.Inet6GW == "" {
 		// "is ip6"?
 	}
 	// XXX: DNS
-	b.config.bootWait, err = time.ParseDuration(b.config.RawBootWait)
 
-	errs = packer.MultiErrorAppend(errs, isoErrs...)
+	var err error
+	b.config.bootWait, err = time.ParseDuration(b.config.RawBootWait)
+	if err != nil {
+		return nil, fmt.Errorf("parsing bootwait time duration: %v", err)
+	}
+
 	if len(errs.Errors) > 0 {
 		return nil, errors.New(errs.Error())
 	}
 
-	return warnings, nil
+	return nil, nil
 }
 
 // direct the workflow of creating the resulting artficat into "steppers"
@@ -98,26 +107,31 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 		return nil, fmt.Errorf("Failed creating VMM driver: %s", err)
 	}
 
+	isoPath, err := homedir.Expand(b.config.IsoImage)
+	if err != nil {
+		return nil, fmt.Errorf("failed expanding iso image: %v", err)
+	}
+
 	steps := []multistep.Step{}
 
 	steps = append(steps, &stepOutDir{
 		outputPath: b.config.OutDir,
+		name:       b.config.PackerBuildName,
 		force:      b.config.PackerForce,
 	})
 
 	steps = append(steps, &stepCreateDisks{
 		outputPath: b.config.OutDir,
-		image:      b.config.ImageName,
+		name:       b.config.PackerBuildName,
 		format:     b.config.DiskFormat,
 		size:       b.config.DiskSize,
 	})
 
 	steps = append(steps, &stepLaunchVM{
-		outputPath: b.config.OutDir,
-		image:      b.config.ImageName,
-		name:       b.config.VMName,
-		mem:        b.config.RAMSize,
-		kernel:     b.config.BootImage,
+		name:   b.config.VMName,
+		mem:    b.config.RAMSize,
+		kernel: b.config.Bios,
+		iso:    isoPath,
 	})
 
 	steps = append(steps, &common.StepHTTPServer{
@@ -149,8 +163,8 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 	}
 
 	artifact := &VmmArtifact{
-		imageDir: 	b.config.OutDir,
-		imageName:	[]string{b.config.ImageName},
+		imageDir:  b.config.OutDir,
+		imageName: []string{b.config.PackerBuildName},
 	}
 	return artifact, nil
 }

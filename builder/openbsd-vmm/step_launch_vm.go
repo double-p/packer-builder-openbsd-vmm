@@ -3,24 +3,22 @@ package openbsdvmm
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
 	"github.com/hashicorp/packer/helper/multistep"
 	"github.com/hashicorp/packer/packer"
 )
 
 type stepLaunchVM struct {
-	outputPath string
-	image      string
-	name       string
-	mem        string
-	kernel     string
+	name   string
+	mem    string
+	kernel string
+	iso    string
 }
 
 func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	driver := state.Get("driver").(Driver)
 	ui := state.Get("ui").(packer.Ui)
-	path := filepath.Join(step.outputPath, step.image)
+	diskImage := state.Get("disk_image").(string)
 
 	command := []string{
 		"start",
@@ -36,8 +34,15 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		"-b",
 		step.kernel,
 		"-d",
-		"/home/pbuehler/packer-builder-openbsd-vmm/" + path,
+		diskImage}
+
+	if step.iso != "" {
+		command = append(command,
+			"-r",
+			step.iso,
+		)
 	}
+
 	ui.Say("Bringing up VM...")
 	if err := driver.Start(command...); err != nil {
 		err := fmt.Errorf("Error bringing VM up: %s", err)
@@ -46,12 +51,16 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		return multistep.ActionHalt
 	}
 
-	state.Put("boot_image", path)
-
 	return multistep.ActionContinue
 }
 
 func (step *stepLaunchVM) Cleanup(state multistep.StateBag) {
-	//driver := state.Get("driver").(Driver)
-	//driver.Stop(step.vmName)
+	driver := state.Get("driver").(Driver)
+	ui := state.Get("ui").(packer.Ui)
+
+	if err := driver.Stop(step.name); err != nil {
+		e := fmt.Errorf("stopping vm (%s): %v", step.name, err)
+		state.Put("error", e)
+		ui.Error(e.Error())
+	}
 }
