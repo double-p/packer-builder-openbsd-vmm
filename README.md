@@ -1,6 +1,9 @@
 # packer-builder-openbsd-vmm
 [Packer](https://packer.io/) builder plugin for OpenBSD's VMM
 
+## Talk
+Find my BSDCan 2019 slides in https://github.com/double-p/presentations/tree/master/BSDCan/2019
+
 ## jumpstart
 ```
 make install
