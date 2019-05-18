@@ -11,7 +11,7 @@ import (
 
 type stepCreateDisks struct {
 	outputPath string
-	image      string
+	name       string
 	format     string
 	size       string
 }
@@ -20,7 +20,7 @@ func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) 
 	driver := state.Get("driver").(Driver)
 	var usedoas bool = false
 	ui := state.Get("ui").(packer.Ui)
-	path := filepath.Join(step.outputPath, step.image)
+	path := filepath.Join(step.outputPath, step.name)
 
 	command := []string{
 		"create",

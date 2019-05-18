@@ -2,23 +2,20 @@
   "builders": [
     {
       "type": "openbsd-vmm",
-      "vm_name": "VMnameinput",
       "name": "packer-obsd64-vmm-amd64",
+      "vm_name": "myvm",
       "disk_size": "1500M",
       "disk_format": "raw",
-      "output_directory": "tempbuilds",
-      "image_name": "OpenBSD-VMM-image",
+      "output_directory": "images",
       "http_directory": "./docroot",
-      "boot_image": "/bsd.rd",
+      "iso_image": "~/Downloads/install65.iso",
+      "bios": "/bsd.rd",
       "boot_wait": "5s",
       "boot_command": [
         "A<enter>",
         "http://{{ .HTTPIP }}:{{ .HTTPPort }}/packer-auto_install.conf<enter>"
       ],
-      "ssh_username": "root",
-      "iso_url": "file:///Users/pbuehler/Software/ISOs/install59.iso",
-      "iso_checksum": "685262fc665425c61a2952b2820389a2d331ac5558217080e6d564d2ce88eecb",
-      "iso_checksum_type": "sha256"
+      "ssh_username": "root"
     }
   ]
 }

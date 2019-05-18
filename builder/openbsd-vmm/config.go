@@ -12,16 +12,15 @@ import (
 type Config struct {
 	common.PackerConfig    `mapstructure:",squash"`
 	common.HTTPConfig      `mapstructure:",squash"`
-	common.ISOConfig       `mapstructure:",squash"`
 	bootcommand.BootConfig `mapstructure:",squash"`
 	Comm                   communicator.Config `mapstructure:",squash"`
 	RawBootWait            string              `mapstructure:"boot_wait"`
 	bootWait               time.Duration       ``
 
 	VMName     string `mapstructure:"vm_name"`
-	Console    bool   `mapstructure:"console"`     // attach a console (to debug)
-	BootImage  string `mapstructure:"boot_image"`  //installNN.fs
-	ImageName  string `mapstructure:"image_name"`  // artifact from build
+	Console    bool   `mapstructure:"console"` // attach a console (to debug)
+	Bios       string `mapstructure:"bios"`    // /bsd.rd, /etc/firmware/vmm-bios
+	IsoImage   string `mapstructure:"iso_image"`
 	DiskSize   string `mapstructure:"disk_size"`   // as vmctl -s
 	DiskFormat string `mapstructure:"disk_format"` // as vmctl create
 	RAMSize    string `mapstructure:"ram_size"`    // as vmctl -m
