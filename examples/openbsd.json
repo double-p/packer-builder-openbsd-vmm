@@ -13,7 +13,7 @@
       "boot_wait": "5s",
       "boot_command": [
         "A<enter>",
-        "http://{{ .HTTPIP }}:{{ .HTTPPort }}/packer-auto_install.conf<enter>"
+        "http://{{ .HTTPIP }}:{{ .HTTPPort }}/packer-auto_install-iso.conf<enter>"
       ],
       "ssh_username": "root"
     }
