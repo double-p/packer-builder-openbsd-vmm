@@ -27,9 +27,11 @@ func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) mult
 	driver := state.Get("driver").(Driver)
 	ui := state.Get("ui").(packer.Ui)
 	httpPort := state.Get("http_port").(int)
+	vmid := state.Get("vm_id").(string)
 
-	hostIp, err := driver.GetTapIPAddress(config.VMName)
+	hostIp, err := driver.GetTapIPAddress(vmid)
 	ui.Say(fmt.Sprintf("%s with Host HTTPD on %s:%d", config.VMName, hostIp, httpPort))
+	ui.Say(fmt.Sprintf("VM ID %s", vmid))
 	common.SetHTTPIP(hostIp)
 	step.ctx.Data = &bootCommandTemplateData{
 		hostIp,

@@ -152,6 +152,10 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 		iso:    isoPath,
 	})
 
+	steps = append(steps, &stepVMparams{
+		name:   b.config.VMName,
+	})
+
 	steps = append(steps, &common.StepHTTPServer{
 		HTTPDir:     b.config.HTTPDir,
 		HTTPPortMin: b.config.HTTPPortMin,

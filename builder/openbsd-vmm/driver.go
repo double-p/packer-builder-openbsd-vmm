@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,6 +22,7 @@ type Driver interface {
 	Start(...string) error
 	Stop(string) error
 	GetTapIPAddress(string) (string, error)
+	GetVMId(string) string
 	//Flush() error
 }
 
@@ -30,6 +33,20 @@ type vmmDriver struct {
 	tty     io.WriteCloser
 	console int
 	ui      packer.Ui
+}
+
+func (d *vmmDriver) GetVMId(name string) string {
+	var stdout bytes.Buffer
+	cmd := exec.Command("vmctl", "status", name)
+	cmd.Stdout = &stdout
+	err := cmd.Run()
+	if _, ok := err.(*exec.ExitError); ok {
+		err = fmt.Errorf("vmctl status error")
+	}
+	stdoutString := strings.TrimSpace(stdout.String())
+	vmctl := regexp.MustCompile(`(\d+)`)
+	resultarr := vmctl.FindAllStringSubmatch(stdoutString, -1)
+	return resultarr[0][1]
 }
 
 func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
@@ -107,8 +124,23 @@ func (d *vmmDriver) Stop(name string) error {
 	return nil
 }
 
-func (d *vmmDriver) GetTapIPAddress(vmname string) (string, error) {
-	return "100.64.1.2", nil
+func (d *vmmDriver) GetTapIPAddress(id string) (string, error) {
+	var stdout bytes.Buffer
+	tapn, _ := strconv.Atoi(id)
+	tapn--
+	tapname := fmt.Sprintf("tap%d", tapn)
+	log.Printf("tapname: %s", tapname)
+	cmd := exec.Command("ifconfig", tapname)
+	cmd.Stdout = &stdout
+	err := cmd.Run()
+	if _, ok := err.(*exec.ExitError); ok {
+		err = fmt.Errorf("ifconfig error")
+	}
+	stdoutString := strings.TrimSpace(stdout.String())
+	log.Printf("ifconfig: %s", stdoutString)
+	vmctl := regexp.MustCompile(`inet (\d+\.\d+\.\d+\.\d+) `)
+	resultarr := vmctl.FindAllStringSubmatch(stdoutString, -1)
+	return resultarr[0][1], err
 }
 
 //// interface Seq requires the following, not using it so far

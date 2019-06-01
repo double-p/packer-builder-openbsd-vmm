@@ -10,10 +10,10 @@
       "http_directory": "./docroot",
       "iso_image": "~/Downloads/install65.iso",
       "bios": "/bsd.rd",
-      "boot_wait": "5s",
+      "boot_wait": "15s",
       "boot_command": [
-        "A<enter>",
-        "http://{{ .HTTPIP }}:{{ .HTTPPort }}/packer-auto_install-iso.conf<enter>"
+        "http://{{ .HTTPIP }}:{{ .HTTPPort }}/packer-auto_install-iso.conf<enter>",
+        "I<enter>"
       ],
       "ssh_username": "root"
     }
