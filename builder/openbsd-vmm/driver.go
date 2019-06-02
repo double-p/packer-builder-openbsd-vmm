@@ -46,6 +46,9 @@ func (d *vmmDriver) GetVMId(name string) string {
 	stdoutString := strings.TrimSpace(stdout.String())
 	vmctl := regexp.MustCompile(`(\d+)`)
 	resultarr := vmctl.FindAllStringSubmatch(stdoutString, -1)
+	if resultarr == nil {
+		return "VMAWOL"
+	}
 	return resultarr[0][1]
 }
 
