@@ -3,29 +3,20 @@
 
 ## Talk
 Find my BSDCan 2019 slides in https://github.com/double-p/presentations/tree/master/BSDCan/2019
+Video not yet available.
 
 ## jumpstart
 ```
 make install
 packer build examples/openbsd.json
-packer build -var-file=examples/config.json examples/openbsd.json
 ```
 More details in BUILD.md
 
-## Example template
+## bugs
+Still some assumptions about how to the find the connected tap(4) interface
 
-```
-{
-  "builders": [
-      {
-          "type": "openbsd-vmm",
-          "image_name": "some-image",
-          "user_data": "",
-          "ssh_username": "root"
-      }
-  ]
-}
-```
+If you find something, please use ``make vmb'' and include the log.
 
 # Remarks
-This is heavily based on https://github.com/m110/packer-builder-hcloud
+This is heavily based on https://github.com/m110/packer-builder-hcloud and
+https://github.com/prep/packer-builder-vmm
