@@ -3,7 +3,7 @@
 
 ## Talk
 Find my BSDCan 2019 slides in https://github.com/double-p/presentations/tree/master/BSDCan/2019
-Video not yet available.
+Video is available at https://www.youtube.com/watch?v=GNmeFi3C1Xg
 
 ## jumpstart
 ```
