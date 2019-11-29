@@ -129,21 +129,34 @@ func (d *vmmDriver) Stop(name string) error {
 
 func (d *vmmDriver) GetTapIPAddress(id string) (string, error) {
 	var stdout bytes.Buffer
-	tapn, _ := strconv.Atoi(id)
-	tapn--
-	tapname := fmt.Sprintf("tap%d", tapn)
-	log.Printf("tapname: %s", tapname)
-	cmd := exec.Command("ifconfig", tapname)
+	vmId, _ := strconv.Atoi(id)
+	vmName := fmt.Sprintf("vm%d", vmId)
+	log.Printf("VM name: %s", vmName)
+	// grab all available interfaces from group "tap"
+	cmd := exec.Command("ifconfig", "tap")
 	cmd.Stdout = &stdout
 	err := cmd.Run()
 	if _, ok := err.(*exec.ExitError); ok {
 		err = fmt.Errorf("ifconfig error")
 	}
+
+	// parse interface(s) description and IPv4 addr
 	stdoutString := strings.TrimSpace(stdout.String())
 	log.Printf("ifconfig: %s", stdoutString)
-	vmctl := regexp.MustCompile(`inet (\d+\.\d+\.\d+\.\d+) `)
+	// XXX works on OpenBSD 6.6, but ugly
+	vmctl := regexp.MustCompile(`description:\s(\w+\d).*\n.*\n.*\n.*\n.*inet (\d+\.\d+\.\d+\.\d+)`)
 	resultarr := vmctl.FindAllStringSubmatch(stdoutString, -1)
-	return resultarr[0][1], err
+	// in case of multiple tap interfaces, loop into the result in order
+	// to find the one we started
+	for _, line := range resultarr {
+		// [1] is the vmName
+		// [2] is the IP
+		if line[1] == vmName {
+			return line[2], err
+		}
+	}
+	err = fmt.Errorf("couldn't parse interface description")
+	return "", err
 }
 
 //// interface Seq requires the following, not using it so far
