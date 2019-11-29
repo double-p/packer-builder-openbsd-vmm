@@ -144,7 +144,7 @@ func (d *vmmDriver) GetTapIPAddress(id string) (string, error) {
 	stdoutString := strings.TrimSpace(stdout.String())
 	log.Printf("ifconfig: %s", stdoutString)
 	// XXX works on OpenBSD 6.6, but ugly
-	vmctl := regexp.MustCompile(`description:\s(\w+\d).*\n.*\n.*\n.*\n.*inet (\d+\.\d+\.\d+\.\d+)`)
+	vmctl := regexp.MustCompile(`description:\s(\w+\d+).*\n.*\n.*\n.*\n.*inet (\d+\.\d+\.\d+\.\d+)`)
 	resultarr := vmctl.FindAllStringSubmatch(stdoutString, -1)
 	// in case of multiple tap interfaces, loop into the result in order
 	// to find the one we started
