@@ -1,0 +1,30 @@
+# $OpenBSD$
+
+ONLY_FOR_ARCHS=		${LP64_ARCHS}
+
+COMMENT=		support vmm(4) in packer
+
+GH_TAGNAME=		v0.9.0
+GH_ACCOUNT=		double-p
+GH_PROJECT=		packer-builder-openbsd-vmm
+
+CATEGORIES=		sysutils
+
+HOMEPAGE=		http://www.packer.io (parent project)
+
+MAINTAINER=		Philipp Buehler <pb@sysfive.org>
+
+# MPLv2
+PERMIT_PACKAGE_CDROM=	Yes
+
+#WANTLIB += c pthread
+
+MODULES=		lang/go
+BUILD_DEPENDS =		sysutils/packer
+RUN_DEPENDS =		sysutils/packer
+
+do-build:
+	cd ${WRKSRC} && GOMAXPROCS=${MAKE_JOBS} GOCACHE=${MODGO_GOCACHE} \
+	  GOPATH=${MODGO_WORKSPACE} ${MAKE_PROGRAM}
+
+.include <bsd.port.mk>
