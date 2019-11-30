@@ -6,6 +6,7 @@ Find my BSDCan 2019 slides in https://github.com/double-p/presentations/tree/mas
 Video is available at https://www.youtube.com/watch?v=GNmeFi3C1Xg
 
 ## jumpstart
+Only for OpenBSD < 6.6; see BUILD.md
 ```
 make install
 packer build examples/openbsd.json
@@ -13,9 +14,12 @@ packer build examples/openbsd.json
 More details in BUILD.md
 
 ## bugs
-Still some assumptions about how to the find the connected tap(4) interface
+Still some mad regexp about how to the find the connected tap(4) interface
 
 If you find something, please use ``make vmb'' and include the log.
+
+## ports(7)
+A ports Makefile is under development and might pop up with 6.7 latest.
 
 # Remarks
 This is heavily based on https://github.com/m110/packer-builder-hcloud and
