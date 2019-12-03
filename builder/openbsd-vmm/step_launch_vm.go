@@ -20,9 +20,10 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 	ui := state.Get("ui").(packer.Ui)
 	diskImage := state.Get("disk_image").(string)
 
+	// >= 6.6 format : vmctl [-v] start [-cL] [-B device] [-b path] [-d disk] [-i count]
+	//                       [-m size] [-n switch] [-r path] [-t name] id | name
 	command := []string{
 		"start",
-		step.name,
 		"-c",
 		"-L",
 		"-B",
@@ -42,6 +43,8 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 			step.iso,
 		)
 	}
+
+	command = append(command, step.name)
 
 	ui.Say("Bringing up VM...")
 	if err := driver.Start(command...); err != nil {

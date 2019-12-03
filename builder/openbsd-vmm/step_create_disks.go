@@ -23,9 +23,9 @@ func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) 
 	ui := state.Get("ui").(packer.Ui)
 	path := filepath.Join(step.outputPath, step.name)
 
+	// >= 6.6 format : vmctl [-v] create [-b base | -i disk] [-s size] disk
 	command := []string{
 		"create",
-		step.format + ":" + path,
 		"-s",
 		step.size,
 	}
@@ -35,6 +35,9 @@ func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) 
 			"-b",
 			step.baseImage)
 	}
+
+	command = append(command,
+		step.format+":"+path)
 
 	ui.Say("Creating disk images...")
 	if err := driver.VmctlCmd(usedoas, command...); err != nil {
