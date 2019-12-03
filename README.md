@@ -6,7 +6,7 @@ Find my BSDCan 2019 slides in https://github.com/double-p/presentations/tree/mas
 Video is available at https://www.youtube.com/watch?v=GNmeFi3C1Xg
 
 ## jumpstart
-Only for OpenBSD < 6.6; see BUILD.md
+Only for OpenBSD >=6.6
 ```
 make install
 packer build examples/openbsd.json
