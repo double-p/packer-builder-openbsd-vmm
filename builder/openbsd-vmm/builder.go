@@ -116,6 +116,11 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 		return nil, fmt.Errorf("Failed creating VMM driver: %s", err)
 	}
 
+	BiosPath, err := homedir.Expand(b.config.Bios)
+	if err != nil {
+		return nil, fmt.Errorf("failed expanding BIOS/kernel image path: %v", err)
+	}
+
 	isoPath, err := homedir.Expand(b.config.IsoImage)
 	if err != nil {
 		return nil, fmt.Errorf("failed expanding iso image path: %v", err)
@@ -148,7 +153,7 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 	steps = append(steps, &stepLaunchVM{
 		name:   b.config.VMName,
 		mem:    b.config.RAMSize,
-		kernel: b.config.Bios,
+		kernel: BiosPath,
 		iso:    isoPath,
 	})
 
