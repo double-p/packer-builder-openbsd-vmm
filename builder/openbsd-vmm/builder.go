@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer/common"
 	"github.com/mitchellh/go-homedir"
 
@@ -29,7 +30,9 @@ type Builder struct {
 	runner multistep.Runner
 }
 
-func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
+func (b *Builder) ConfigSpec() hcldec.ObjectSpec { return b.config.FlatMapstructure().HCL2Spec() }
+
+func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 	if err := config.Decode(&b.config, &config.DecodeOpts{
 		Interpolate:        true,
 		InterpolateContext: &b.config.ctx,
@@ -39,7 +42,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 			},
 		},
 	}, raws...); err != nil {
-		return nil, fmt.Errorf("decoding config: %v", err)
+		return nil, nil, fmt.Errorf("decoding config: %v", err)
 	}
 
 	var errs *packer.MultiError
@@ -99,14 +102,14 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, error) {
 	var err error
 	b.config.bootWait, err = time.ParseDuration(b.config.RawBootWait)
 	if err != nil {
-		return nil, fmt.Errorf("parsing bootwait time duration: %v", err)
+		return nil, nil, fmt.Errorf("parsing bootwait time duration: %v", err)
 	}
 
 	if len(errs.Errors) > 0 {
-		return nil, errors.New(errs.Error())
+		return nil, nil, errors.New(errs.Error())
 	}
 
-	return nil, nil
+	return nil, nil, nil
 }
 
 // direct the workflow of creating the resulting artficat into "steppers"
