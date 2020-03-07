@@ -62,19 +62,21 @@ type FlatConfig struct {
 	WinRMUseSSL               *bool             `mapstructure:"winrm_use_ssl" cty:"winrm_use_ssl"`
 	WinRMInsecure             *bool             `mapstructure:"winrm_insecure" cty:"winrm_insecure"`
 	WinRMUseNTLM              *bool             `mapstructure:"winrm_use_ntlm" cty:"winrm_use_ntlm"`
-	VMName                    *string           `mapstructure:"vm_name" cty:"vm_name"`
+	VMName                    *string           `mapstructure:"vm_name" required:"true" cty:"vm_name"`
+	VMTemplate                *string           `mapstructure:"vm_template" required:"true" cty:"vm_template"`
 	Console                   *bool             `mapstructure:"console" cty:"console"`
-	Bios                      *string           `mapstructure:"bios" cty:"bios"`
-	IsoImage                  *string           `mapstructure:"iso_image" cty:"iso_image"`
+	Boot                      *string           `mapstructure:"boot" cty:"boot"`
+	CdRom                     *string           `mapstructure:"cdrom" cty:"cdrom"`
 	DiskSize                  *string           `mapstructure:"disk_size" cty:"disk_size"`
 	DiskFormat                *string           `mapstructure:"disk_format" cty:"disk_format"`
 	DiskBase                  *string           `mapstructure:"disk_base" cty:"disk_base"`
-	RAMSize                   *string           `mapstructure:"ram_size" cty:"ram_size"`
+	MemorySize                *string           `mapstructure:"memory" cty:"memory"`
 	Inet4                     *string           `mapstructure:"inet4" cty:"inet4"`
 	Inet4GW                   *string           `mapstructure:"inet4gw" cty:"inet4gw"`
 	Inet6                     *string           `mapstructure:"inet6" cty:"inet6"`
 	Inet6GW                   *string           `mapstructure:"inet6gw" cty:"inet6gw"`
 	DNS                       *string           `mapstructure:"nameservers" cty:"nameservers"`
+	LogDir                    *string           `mapstructure:"log_directory" cty:"log_directory"`
 	OutDir                    *string           `mapstructure:"output_directory" cty:"output_directory"`
 	UserData                  *string           `mapstructure:"user_data" cty:"user_data"`
 }
@@ -145,18 +147,20 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"winrm_insecure":               &hcldec.AttrSpec{Name: "winrm_insecure", Type: cty.Bool, Required: false},
 		"winrm_use_ntlm":               &hcldec.AttrSpec{Name: "winrm_use_ntlm", Type: cty.Bool, Required: false},
 		"vm_name":                      &hcldec.AttrSpec{Name: "vm_name", Type: cty.String, Required: false},
+		"vm_template":                  &hcldec.AttrSpec{Name: "vm_template", Type: cty.String, Required: false},
 		"console":                      &hcldec.AttrSpec{Name: "console", Type: cty.Bool, Required: false},
-		"bios":                         &hcldec.AttrSpec{Name: "bios", Type: cty.String, Required: false},
-		"iso_image":                    &hcldec.AttrSpec{Name: "iso_image", Type: cty.String, Required: false},
+		"boot":                         &hcldec.AttrSpec{Name: "boot", Type: cty.String, Required: false},
+		"cdrom":                        &hcldec.AttrSpec{Name: "cdrom", Type: cty.String, Required: false},
 		"disk_size":                    &hcldec.AttrSpec{Name: "disk_size", Type: cty.String, Required: false},
 		"disk_format":                  &hcldec.AttrSpec{Name: "disk_format", Type: cty.String, Required: false},
 		"disk_base":                    &hcldec.AttrSpec{Name: "disk_base", Type: cty.String, Required: false},
-		"ram_size":                     &hcldec.AttrSpec{Name: "ram_size", Type: cty.String, Required: false},
+		"memory":                       &hcldec.AttrSpec{Name: "memory", Type: cty.String, Required: false},
 		"inet4":                        &hcldec.AttrSpec{Name: "inet4", Type: cty.String, Required: false},
 		"inet4gw":                      &hcldec.AttrSpec{Name: "inet4gw", Type: cty.String, Required: false},
 		"inet6":                        &hcldec.AttrSpec{Name: "inet6", Type: cty.String, Required: false},
 		"inet6gw":                      &hcldec.AttrSpec{Name: "inet6gw", Type: cty.String, Required: false},
 		"nameservers":                  &hcldec.AttrSpec{Name: "nameservers", Type: cty.String, Required: false},
+		"log_directory":                &hcldec.AttrSpec{Name: "log_directory", Type: cty.String, Required: false},
 		"output_directory":             &hcldec.AttrSpec{Name: "output_directory", Type: cty.String, Required: false},
 		"user_data":                    &hcldec.AttrSpec{Name: "user_data", Type: cty.String, Required: false},
 	}

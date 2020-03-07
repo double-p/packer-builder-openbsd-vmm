@@ -17,14 +17,15 @@ type Config struct {
 	RawBootWait            string              `mapstructure:"boot_wait"`
 	bootWait               time.Duration       ``
 
-	VMName     string `mapstructure:"vm_name"`
+	VMName     string `mapstructure:"vm_name" required:"true"`
+	VMTemplate string `mapstructure:"vm_template" required:"true"`
 	Console    bool   `mapstructure:"console"` // attach a console (to debug)
-	Bios       string `mapstructure:"bios"`    // /bsd.rd, /etc/firmware/vmm-bios
-	IsoImage   string `mapstructure:"iso_image"`
+	Boot       string `mapstructure:"boot"`    // /bsd.rd, /etc/firmware/vmm-bios
+	CdRom      string `mapstructure:"cdrom"`
 	DiskSize   string `mapstructure:"disk_size"`   // as vmctl -s
 	DiskFormat string `mapstructure:"disk_format"` // as vmctl create
 	DiskBase   string `mapstructure:"disk_base"`   // for qcow2 only
-	RAMSize    string `mapstructure:"ram_size"`    // as vmctl -m
+	MemorySize string `mapstructure:"memory"`      // as vmctl -m
 	// not everybody lives in autoconf/DHCP; populate for hostname.vi0
 	Inet4   string `mapstructure:"inet4"`       // hostname.if 'inet'
 	Inet4GW string `mapstructure:"inet4gw"`     // mygate 'inet'
@@ -32,6 +33,7 @@ type Config struct {
 	Inet6GW string `mapstructure:"inet6gw"`     // mygate 'inet6'
 	DNS     string `mapstructure:"nameservers"` // resolv.conf, comma-separated
 
+	LogDir   string `mapstructure:"log_directory"`
 	OutDir   string `mapstructure:"output_directory"`
 	UserData string `mapstructure:"user_data"`
 

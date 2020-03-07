@@ -1,0 +1,22 @@
+local prefix 192.168.255.128/28
+sets="/var/www/htdocs/openbsd/snapshots/amd64/"
+iso="install66.iso"
+
+switch "local" {
+	interface bridge0
+}
+
+vm generic {
+	disable
+	owner packer_user
+	disk /dev/null
+	cdrom $sets $iso
+	allow instance {
+		boot,
+		cdrom,
+		disk,
+		instance,
+		interface,
+		memory
+	}
+}

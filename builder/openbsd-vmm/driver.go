@@ -18,7 +18,7 @@ import (
 
 type Driver interface {
 	bootcommand.BCDriver
-	VmctlCmd(bool, ...string) error
+	VmctlCmd(args ...string) error
 	Start(...string) error
 	Stop(string) error
 	GetTapIPAddress(string) (string, error)
@@ -27,7 +27,6 @@ type Driver interface {
 }
 
 type vmmDriver struct {
-	doas    string
 	vmctl   string
 	logfile string
 	tty     io.WriteCloser
@@ -52,20 +51,12 @@ func (d *vmmDriver) GetVMId(name string) string {
 	return resultarr[0][1]
 }
 
-func (d *vmmDriver) VmctlCmd(usedoas bool, args ...string) error {
+func (d *vmmDriver) VmctlCmd(args ...string) error {
 	var stdout, stderr bytes.Buffer
 	var cmd *exec.Cmd
-	if usedoas {
-		args = append([]string{d.vmctl}, args...)
-		//args = append([]string{"ktrace"}, args...)
-		log.Printf("Executing doas: %#v", args)
-		cmd = exec.Command(d.doas, args...)
-	} else {
-		//args = append([]string{"vmctl"}, args...)
-		//cmd = exec.Command("ktrace", args...)
-		log.Printf("Executing vmctl: %#v", args)
-		cmd = exec.Command(d.vmctl, args...)
-	}
+	//cmd = exec.Command("ktrace", args...)
+	log.Printf("Executing vmctl: %#v", args)
+	cmd = exec.Command(d.vmctl, args...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	err := cmd.Run()
@@ -88,10 +79,9 @@ func (d *vmmDriver) Start(args ...string) error {
 		return err
 	}
 
-	args = append([]string{d.vmctl}, args...)
-	//d.ui.Message("Executing " + d.doas + " " + strings.Join(args, " "))
+	//d.ui.Message("Executing vmctl:" + strings.Join(args, " "))
 
-	cmd := exec.Command(d.doas, args...)
+	cmd := exec.Command(d.vmctl, args...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
@@ -121,7 +111,7 @@ func (d *vmmDriver) Start(args ...string) error {
 }
 
 func (d *vmmDriver) Stop(name string) error {
-	cmd := exec.Command(d.doas, d.vmctl, "stop", name)
+	cmd := exec.Command(d.vmctl, "stop", name)
 	//err := cmd.Run()
 	cmd.Run()
 	return nil
