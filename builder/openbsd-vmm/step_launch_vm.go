@@ -9,10 +9,11 @@ import (
 )
 
 type stepLaunchVM struct {
-	name   string
-	mem    string
-	kernel string
-	iso    string
+	name     string
+	mem      string
+	kernel   string
+	iso      string
+	template string
 }
 
 func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
@@ -30,12 +31,24 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		"net",
 		"-i",
 		"1",
-		"-m",
-		step.mem,
-		"-b",
-		step.kernel,
 		"-d",
-		diskImage}
+		diskImage,
+		"-t",
+		step.template}
+
+	if step.mem != "" {
+		command = append(command,
+			"-m",
+			step.mem,
+		)
+	}
+
+	if step.kernel != "" {
+		command = append(command,
+			"-b",
+			step.kernel,
+		)
+	}
 
 	if step.iso != "" {
 		command = append(command,

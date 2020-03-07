@@ -8,7 +8,6 @@ import (
 
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer/common"
-	"github.com/mitchellh/go-homedir"
 
 	//"github.com/hashicorp/packer/helper/communicator"
 	"github.com/hashicorp/packer/helper/config"
@@ -50,11 +49,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 	errs = packer.MultiErrorAppend(errs, b.config.HTTPConfig.Prepare(&b.config.ctx)...)
 
 	if b.config.VMName == "" {
-		b.config.VMName = "packer-" + b.config.PackerBuildName
-	}
-
-	if b.config.Bios == "" {
-		b.config.Bios = "/etc/firmware/vmm-bios"
+		b.config.VMName = b.config.PackerBuildName
 	}
 
 	if b.config.OutDir == "" {
@@ -70,16 +65,12 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 	case "":
 		b.config.DiskFormat = _DISK_RAW
 	default:
-		errs = packer.MultiErrorAppend(errs, errors.New("Unsupported disk_format name: "+b.config.DiskFormat))
+		errs = packer.MultiErrorAppend(errs, errors.New("Unsupported disk_format name: " + b.config.DiskFormat))
 	}
 
 	if b.config.DiskBase != "" && b.config.DiskFormat != _DISK_QCOW2 {
 		errs = packer.MultiErrorAppend(errs, errors.New(
 			"Cannot specify a base image without using qcow2 disk format"))
-	}
-
-	if b.config.RAMSize == "" {
-		b.config.RAMSize = "512M"
 	}
 
 	if b.config.Inet4 == "" {
@@ -119,29 +110,12 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 		return nil, fmt.Errorf("Failed creating VMM driver: %s", err)
 	}
 
-	BiosPath, err := homedir.Expand(b.config.Bios)
-	if err != nil {
-		return nil, fmt.Errorf("failed expanding BIOS/kernel image path: %v", err)
-	}
-
-	isoPath, err := homedir.Expand(b.config.IsoImage)
-	if err != nil {
-		return nil, fmt.Errorf("failed expanding iso image path: %v", err)
-	}
-
-	var basePath string
-	if b.config.DiskBase != "" {
-		basePath, err = homedir.Expand(b.config.DiskBase)
-		if err != nil {
-			return nil, fmt.Errorf("failed expanding disk base path: %v", err)
-		}
-	}
-
 	steps := []multistep.Step{}
 
 	steps = append(steps, &stepOutDir{
 		outputPath: b.config.OutDir,
 		name:       b.config.PackerBuildName,
+		format:     b.config.DiskFormat,
 		force:      b.config.PackerForce,
 	})
 
@@ -149,15 +123,16 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 		outputPath: b.config.OutDir,
 		name:       b.config.PackerBuildName,
 		format:     b.config.DiskFormat,
-		baseImage:  basePath,
+		baseImage:  b.config.DiskBase,
 		size:       b.config.DiskSize,
 	})
 
 	steps = append(steps, &stepLaunchVM{
-		name:   b.config.VMName,
-		mem:    b.config.RAMSize,
-		kernel: BiosPath,
-		iso:    isoPath,
+		name:     b.config.VMName,
+		mem:      b.config.MemorySize,
+		kernel:   b.config.Boot,
+		iso:      b.config.CdRom,
+		template: b.config.VMTemplate,
 	})
 
 	steps = append(steps, &stepVMparams{
@@ -200,13 +175,10 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 }
 
 func (b *Builder) newDriver() (Driver, error) {
-	// XXX: check doas.conf basics/existance
-	doasbin := "/usr/bin/doas"
 	// XXX: check VMD capable (see vagrant-openbsd-driver)
 	vmctlbin := "/usr/sbin/vmctl"
-	log := filepath.Join(b.config.OutDir+"/../", b.config.VMName+".log")
+	log := filepath.Join(b.config.LogDir, b.config.VMName + ".log")
 	driver := &vmmDriver{
-		doas:    doasbin,
 		logfile: log,
 		vmctl:   vmctlbin,
 	}

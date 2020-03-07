@@ -13,6 +13,7 @@ import (
 type stepOutDir struct {
 	outputPath string
 	name       string
+	format     string
 	force      bool
 }
 
@@ -32,7 +33,7 @@ func (step *stepOutDir) Run(ctx context.Context, state multistep.StateBag) multi
 
 	// Check if output image exists
 	if _, err := os.Stat(
-		filepath.Join(step.outputPath, step.name)); !os.IsNotExist(err) {
+		filepath.Join(step.outputPath, step.name, ".", step.format)); !os.IsNotExist(err) {
 		// If the build isn't forced, error out here.
 		if !step.force {
 			state.Put("error", fmt.Errorf("image already exists: %s", step.name))
