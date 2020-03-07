@@ -11,7 +11,8 @@
       "output_directory": "/home/packer_user/.local/share/packer",
       "boot_wait": "15s",
       "boot_command": [
-	"http://192.168.255.1/autoinstall/packer-install.conf<enter>"
+	"http://{{ .HTTPIP }}:{{ .HTTPPort }}/packer-auto_install-iso.conf<enter>",
+	"I<enter>"
       ],
       "ssh_username": "root"
     }
