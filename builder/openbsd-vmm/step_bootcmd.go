@@ -70,5 +70,4 @@ func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) mult
 	return multistep.ActionContinue
 }
 
-func (step *stepBootCmd) Cleanup(state multistep.StateBag) {
-}
+func (step *stepBootCmd) Cleanup(state multistep.StateBag) {}

@@ -11,6 +11,7 @@ import (
 type stepLaunchVM struct {
 	name     string
 	mem      string
+	bootdev  string
 	kernel   string
 	iso      string
 	template string
@@ -27,8 +28,6 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		"start",
 		"-c",
 		"-L",
-		"-B",
-		"net",
 		"-i",
 		"1",
 		"-d",
@@ -40,6 +39,13 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 		command = append(command,
 			"-m",
 			step.mem,
+		)
+	}
+
+	if step.bootdev != "" {
+		command = append(command,
+			"-B",
+			step.bootdev,
 		)
 	}
 
@@ -60,6 +66,7 @@ func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) mul
 	command = append(command, step.name)
 
 	ui.Say("Bringing up VM...")
+	//ui.Message(fmt.Sprintf("Starting VM: vmctl %s", strings.Join(command, " ")))
 	if err := driver.Start(command...); err != nil {
 		err := fmt.Errorf("Error bringing VM up: %s", err)
 		state.Put("error", err)

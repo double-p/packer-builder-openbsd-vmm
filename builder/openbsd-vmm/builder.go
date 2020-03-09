@@ -8,8 +8,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer/common"
-
-	//"github.com/hashicorp/packer/helper/communicator"
+	"github.com/hashicorp/packer/helper/communicator"
 	"github.com/hashicorp/packer/helper/config"
 	"github.com/hashicorp/packer/helper/multistep"
 	"github.com/hashicorp/packer/packer"
@@ -47,13 +46,11 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 	var errs *packer.MultiError
 	errs = packer.MultiErrorAppend(errs, b.config.Comm.Prepare(&b.config.ctx)...)
 	errs = packer.MultiErrorAppend(errs, b.config.HTTPConfig.Prepare(&b.config.ctx)...)
+	errs = packer.MultiErrorAppend(errs, b.config.ShutdownConfig.Prepare(&b.config.ctx)...)
 
 	if b.config.VMName == "" {
-		b.config.VMName = b.config.PackerBuildName
-	}
-
-	if b.config.OutDir == "" {
-		b.config.OutDir = fmt.Sprintf("output-%s", b.config.PackerBuildName)
+		errs = packer.MultiErrorAppend(errs, errors.New(
+			"No vm_name specified"))
 	}
 
 	// DiskSize can be omitted if you're starting from a base image
@@ -114,14 +111,14 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 
 	steps = append(steps, &stepOutDir{
 		outputPath: b.config.OutDir,
-		name:       b.config.PackerBuildName,
+		name:       b.config.VMName,
 		format:     b.config.DiskFormat,
 		force:      b.config.PackerForce,
 	})
 
 	steps = append(steps, &stepCreateDisks{
 		outputPath: b.config.OutDir,
-		name:       b.config.PackerBuildName,
+		name:       b.config.VMName,
 		format:     b.config.DiskFormat,
 		baseImage:  b.config.DiskBase,
 		size:       b.config.DiskSize,
@@ -130,6 +127,7 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 	steps = append(steps, &stepLaunchVM{
 		name:     b.config.VMName,
 		mem:      b.config.MemorySize,
+		bootdev:  b.config.BootDevice,
 		kernel:   b.config.Boot,
 		iso:      b.config.CdRom,
 		template: b.config.VMTemplate,
@@ -150,9 +148,31 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 		ctx: b.config.ctx,
 	})
 
+	// after install, boot from disk
+	steps = append(steps, &stepLaunchVM{
+		name:     b.config.VMName,
+		mem:      b.config.MemorySize,
+		iso:      b.config.CdRom,
+		template: b.config.VMTemplate,
+	})
+
+	steps = append(steps, &stepVMparams{
+		name:   b.config.VMName,
+	})
+
+	steps = append(steps, &communicator.StepConnect{
+		Config:    &b.config.Comm,
+		Host:      CommHost(),
+		SSHConfig: b.config.Comm.SSHConfigFunc(),
+	})
+
+	steps = append(steps, &common.StepProvision{})
+
+	steps = append(steps, &stepShutdown{})
+
 	state := new(multistep.BasicStateBag)
-	state.Put("driver", driver)
 	state.Put("config", &b.config)
+	state.Put("driver", driver)
 	state.Put("hook", hook)
 	state.Put("ui", ui)
 
@@ -169,7 +189,7 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 
 	artifact := &VmmArtifact{
 		imageDir:  b.config.OutDir,
-		imageName: []string{b.config.PackerBuildName},
+		imageName: []string{b.config.VMName},
 	}
 	return artifact, nil
 }

@@ -22,6 +22,8 @@ type FlatConfig struct {
 	BootGroupInterval         *string           `mapstructure:"boot_keygroup_interval" cty:"boot_keygroup_interval"`
 	BootWait                  *string           `mapstructure:"boot_wait" cty:"boot_wait"`
 	BootCommand               []string          `mapstructure:"boot_command" cty:"boot_command"`
+	ShutdownCommand           *string           `mapstructure:"shutdown_command" required:"false" cty:"shutdown_command"`
+	ShutdownTimeout           *string           `mapstructure:"shutdown_timeout" required:"false" cty:"shutdown_timeout"`
 	Type                      *string           `mapstructure:"communicator" cty:"communicator"`
 	PauseBeforeConnect        *string           `mapstructure:"pause_before_connecting" cty:"pause_before_connecting"`
 	SSHHost                   *string           `mapstructure:"ssh_host" cty:"ssh_host"`
@@ -65,11 +67,12 @@ type FlatConfig struct {
 	VMName                    *string           `mapstructure:"vm_name" required:"true" cty:"vm_name"`
 	VMTemplate                *string           `mapstructure:"vm_template" required:"true" cty:"vm_template"`
 	Console                   *bool             `mapstructure:"console" cty:"console"`
+	BootDevice                *string           `mapstructure:"boot_device" cty:"boot_device"`
 	Boot                      *string           `mapstructure:"boot" cty:"boot"`
 	CdRom                     *string           `mapstructure:"cdrom" cty:"cdrom"`
-	DiskSize                  *string           `mapstructure:"disk_size" cty:"disk_size"`
 	DiskFormat                *string           `mapstructure:"disk_format" cty:"disk_format"`
 	DiskBase                  *string           `mapstructure:"disk_base" cty:"disk_base"`
+	DiskSize                  *string           `mapstructure:"disk_size" cty:"disk_size"`
 	MemorySize                *string           `mapstructure:"memory" cty:"memory"`
 	Inet4                     *string           `mapstructure:"inet4" cty:"inet4"`
 	Inet4GW                   *string           `mapstructure:"inet4gw" cty:"inet4gw"`
@@ -106,6 +109,8 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"boot_keygroup_interval":       &hcldec.AttrSpec{Name: "boot_keygroup_interval", Type: cty.String, Required: false},
 		"boot_wait":                    &hcldec.AttrSpec{Name: "boot_wait", Type: cty.String, Required: false},
 		"boot_command":                 &hcldec.AttrSpec{Name: "boot_command", Type: cty.List(cty.String), Required: false},
+		"shutdown_command":             &hcldec.AttrSpec{Name: "shutdown_command", Type: cty.String, Required: false},
+		"shutdown_timeout":             &hcldec.AttrSpec{Name: "shutdown_timeout", Type: cty.String, Required: false},
 		"communicator":                 &hcldec.AttrSpec{Name: "communicator", Type: cty.String, Required: false},
 		"pause_before_connecting":      &hcldec.AttrSpec{Name: "pause_before_connecting", Type: cty.String, Required: false},
 		"ssh_host":                     &hcldec.AttrSpec{Name: "ssh_host", Type: cty.String, Required: false},
@@ -149,11 +154,12 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"vm_name":                      &hcldec.AttrSpec{Name: "vm_name", Type: cty.String, Required: false},
 		"vm_template":                  &hcldec.AttrSpec{Name: "vm_template", Type: cty.String, Required: false},
 		"console":                      &hcldec.AttrSpec{Name: "console", Type: cty.Bool, Required: false},
+		"boot_device":                  &hcldec.AttrSpec{Name: "boot_device", Type: cty.String, Required: false},
 		"boot":                         &hcldec.AttrSpec{Name: "boot", Type: cty.String, Required: false},
 		"cdrom":                        &hcldec.AttrSpec{Name: "cdrom", Type: cty.String, Required: false},
-		"disk_size":                    &hcldec.AttrSpec{Name: "disk_size", Type: cty.String, Required: false},
 		"disk_format":                  &hcldec.AttrSpec{Name: "disk_format", Type: cty.String, Required: false},
 		"disk_base":                    &hcldec.AttrSpec{Name: "disk_base", Type: cty.String, Required: false},
+		"disk_size":                    &hcldec.AttrSpec{Name: "disk_size", Type: cty.String, Required: false},
 		"memory":                       &hcldec.AttrSpec{Name: "memory", Type: cty.String, Required: false},
 		"inet4":                        &hcldec.AttrSpec{Name: "inet4", Type: cty.String, Required: false},
 		"inet4gw":                      &hcldec.AttrSpec{Name: "inet4gw", Type: cty.String, Required: false},
