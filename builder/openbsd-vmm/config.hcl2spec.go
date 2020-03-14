@@ -74,11 +74,6 @@ type FlatConfig struct {
 	DiskBase                  *string           `mapstructure:"disk_base" cty:"disk_base"`
 	DiskSize                  *string           `mapstructure:"disk_size" cty:"disk_size"`
 	MemorySize                *string           `mapstructure:"memory" cty:"memory"`
-	Inet4                     *string           `mapstructure:"inet4" cty:"inet4"`
-	Inet4GW                   *string           `mapstructure:"inet4gw" cty:"inet4gw"`
-	Inet6                     *string           `mapstructure:"inet6" cty:"inet6"`
-	Inet6GW                   *string           `mapstructure:"inet6gw" cty:"inet6gw"`
-	DNS                       *string           `mapstructure:"nameservers" cty:"nameservers"`
 	LogDir                    *string           `mapstructure:"log_directory" cty:"log_directory"`
 	OutDir                    *string           `mapstructure:"output_directory" cty:"output_directory"`
 	UserData                  *string           `mapstructure:"user_data" cty:"user_data"`
@@ -161,11 +156,6 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"disk_base":                    &hcldec.AttrSpec{Name: "disk_base", Type: cty.String, Required: false},
 		"disk_size":                    &hcldec.AttrSpec{Name: "disk_size", Type: cty.String, Required: false},
 		"memory":                       &hcldec.AttrSpec{Name: "memory", Type: cty.String, Required: false},
-		"inet4":                        &hcldec.AttrSpec{Name: "inet4", Type: cty.String, Required: false},
-		"inet4gw":                      &hcldec.AttrSpec{Name: "inet4gw", Type: cty.String, Required: false},
-		"inet6":                        &hcldec.AttrSpec{Name: "inet6", Type: cty.String, Required: false},
-		"inet6gw":                      &hcldec.AttrSpec{Name: "inet6gw", Type: cty.String, Required: false},
-		"nameservers":                  &hcldec.AttrSpec{Name: "nameservers", Type: cty.String, Required: false},
 		"log_directory":                &hcldec.AttrSpec{Name: "log_directory", Type: cty.String, Required: false},
 		"output_directory":             &hcldec.AttrSpec{Name: "output_directory", Type: cty.String, Required: false},
 		"user_data":                    &hcldec.AttrSpec{Name: "user_data", Type: cty.String, Required: false},

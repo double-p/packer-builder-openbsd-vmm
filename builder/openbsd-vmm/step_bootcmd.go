@@ -3,6 +3,7 @@ package openbsdvmm
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/hashicorp/packer/common"
@@ -13,8 +14,9 @@ import (
 )
 
 type stepBootCmd struct {
-	cmd string
-	ctx interpolate.Context
+	cmd      string
+	BootWait time.Duration
+	ctx      interpolate.Context
 }
 
 type bootCommandTemplateData struct {
@@ -26,23 +28,28 @@ func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) mult
 	config := state.Get("config").(*Config)
 	driver := state.Get("driver").(Driver)
 	ui := state.Get("ui").(packer.Ui)
-	httpPort := state.Get("http_port").(int)
-	vmid := state.Get("vm_id").(string)
 
-	hostIp, err := driver.GetTapIPAddress(vmid)
-	ui.Say(fmt.Sprintf("%s with Host HTTPD on %s:%d", config.VMName, hostIp, httpPort))
-	ui.Say(fmt.Sprintf("VM ID %s", vmid))
-	common.SetHTTPIP(hostIp)
+	step_descr := state.Get("step_descr").(string)
+	httpPort := state.Get("http_port").(int)
+	hostIP := state.Get("host_ip").(string)
+
+	log.Printf("HTTP IP/port: %s:%d", hostIP, httpPort)
+	common.SetHTTPIP(hostIP)
 	step.ctx.Data = &bootCommandTemplateData{
-		hostIp,
+		hostIP,
 		httpPort,
 	}
 
-	ui.Say(fmt.Sprintf("boot_wait is (%s).", config.bootWait.String()))
-	if int64(config.bootWait) > 0 {
-		time.Sleep(time.Duration(config.bootWait))
+	if int64(step.BootWait) > 0 {
+		ui.Say(fmt.Sprintf("Waiting %s before %s starts...", step.BootWait.String(), step_descr))
+		time.Sleep(time.Duration(step.BootWait))
+		select {
+		case <-time.After(step.BootWait):
+			break
+		case <-ctx.Done():
+			return multistep.ActionHalt
+		}
 	}
-	ui.Say("Typing the boot command...")
 	command, err := interpolate.Render(step.cmd, &step.ctx)
 	if err != nil {
 		state.Put("error", fmt.Errorf("Error preparing boot command: %s", err))
@@ -59,7 +66,7 @@ func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) mult
 		state.Put("error", fmt.Errorf("Error running boot command: %s", err))
 		return multistep.ActionHalt
 	}
-	ui.Say("Waiting for bootcommand to finish...")
+	ui.Say(fmt.Sprintf("Waiting until %s is completed and VM %s shutdown...", step_descr, config.VMName))
 	for {
 		halted := driver.GetVMId(config.VMName)
 		if halted == "VMAWOL" {

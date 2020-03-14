@@ -54,9 +54,7 @@ func (d *vmmDriver) GetVMId(name string) string {
 func (d *vmmDriver) VmctlCmd(args ...string) error {
 	var stdout, stderr bytes.Buffer
 	var cmd *exec.Cmd
-	//cmd = exec.Command("ktrace", args...)
-	//log.Printf("Executing vmctl: %#v", args)
-	log.Printf("Executing vmctl: vmctl %s", strings.Join(args, " "))
+	log.Printf("Executing command: vmctl %s", strings.Join(args, " "))
 	cmd = exec.Command(d.vmctl, args...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -79,7 +77,6 @@ func (d *vmmDriver) Start(args ...string) error {
 		return err
 	}
 
-	//log.Printf("Executing vmctl: %#v", args)
 	log.Printf("Executing vmctl: vmctl %s", strings.Join(args, " "))
 
 	cmd := exec.Command(d.vmctl, args...)
@@ -123,6 +120,7 @@ func (d *vmmDriver) GetTapIPAddress(id string) (string, error) {
 	vmId, _ := strconv.Atoi(id)
 	vmName := fmt.Sprintf("vm%d", vmId)
 	log.Printf("VM name: %s", vmName)
+
 	// grab all available interfaces from group "tap"
 	cmd := exec.Command("ifconfig", "tap")
 	cmd.Stdout = &stdout
@@ -176,6 +174,7 @@ func (d *vmmDriver) SendSpecial(special string, action bootcommand.KeyAction) er
 
 	return nil
 }
+
 func (driver *vmmDriver) Flush() error {
 	return nil
 }

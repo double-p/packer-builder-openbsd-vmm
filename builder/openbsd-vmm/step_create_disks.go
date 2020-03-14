@@ -20,25 +20,23 @@ type stepCreateDisks struct {
 func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	driver := state.Get("driver").(Driver)
 	ui := state.Get("ui").(packer.Ui)
-	path := filepath.Join(step.outputPath, step.name + "." + step.format)
+	path := filepath.Join(step.outputPath, step.name+"."+step.format)
 
-	// >= 6.6 format : vmctl [-v] create [-b base | -i disk] [-s size] disk
 	command := []string{
 		"create",
 		"-s",
 		step.size,
 	}
-
 	if step.baseImage != "" {
 		command = append(command,
-			"-b",
-			step.baseImage)
+			"-b", step.baseImage,
+		)
 	}
-
 	command = append(command,
-		step.format + ":" + path)
+		step.format+":"+path,
+	)
 
-	ui.Say("Creating disk images...")
+	ui.Say(fmt.Sprintf("Creating %s disk image...", step.format))
 	if err := driver.VmctlCmd(command...); err != nil {
 		err := fmt.Errorf("Error creating disk image: %s", err)
 		state.Put("error", err)

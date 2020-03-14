@@ -6,14 +6,14 @@ import (
 
 func CommHost() func(multistep.StateBag) (string, error) {
 	return func(state multistep.StateBag) (string, error) {
-		config := state.Get("config").(*Config)
-		return config.Comm.SSHHost, nil
+		sshHost := state.Get("ssh_host").(string)
+		return sshHost, nil
 	}
 }
 
 func SSHPort() func(multistep.StateBag) (int, error) {
 	return func(state multistep.StateBag) (int, error) {
 		config := state.Get("config").(*Config)
-		return config.Comm.SSHPort, nil
+		return config.CommConfig.SSHPort, nil
 	}
 }

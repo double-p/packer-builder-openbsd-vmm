@@ -23,7 +23,7 @@ import (
 //
 // Produces:
 //   <nothing>
-type stepShutdown struct {}
+type stepShutdown struct{}
 
 func (step *stepShutdown) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	comm := state.Get("communicator").(packer.Communicator)

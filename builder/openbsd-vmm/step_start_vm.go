@@ -3,12 +3,15 @@ package openbsdvmm
 import (
 	"context"
 	"fmt"
+	"log"
+	"net"
 
 	"github.com/hashicorp/packer/helper/multistep"
 	"github.com/hashicorp/packer/packer"
 )
 
-type stepLaunchVM struct {
+type stepStartVM struct {
+	descr    string
 	name     string
 	mem      string
 	bootdev  string
@@ -17,73 +20,79 @@ type stepLaunchVM struct {
 	template string
 }
 
-func (step *stepLaunchVM) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
+func (step *stepStartVM) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	driver := state.Get("driver").(Driver)
 	ui := state.Get("ui").(packer.Ui)
 	diskImage := state.Get("disk_image").(string)
 
-	// >= 6.6 format : vmctl [-v] start [-cL] [-B device] [-b path] [-d disk] [-i count]
-	//                       [-m size] [-n switch] [-r path] [-t name] id | name
 	command := []string{
 		"start",
 		"-c",
 		"-L",
-		"-i",
-		"1",
 		"-d",
 		diskImage,
 		"-t",
 		step.template}
-
 	if step.mem != "" {
 		command = append(command,
 			"-m",
 			step.mem,
 		)
 	}
-
 	if step.bootdev != "" {
 		command = append(command,
 			"-B",
 			step.bootdev,
 		)
 	}
-
 	if step.kernel != "" {
 		command = append(command,
 			"-b",
 			step.kernel,
 		)
 	}
-
 	if step.iso != "" {
 		command = append(command,
 			"-r",
 			step.iso,
 		)
 	}
-
 	command = append(command, step.name)
 
-	ui.Say("Bringing up VM...")
-	//ui.Message(fmt.Sprintf("Starting VM: vmctl %s", strings.Join(command, " ")))
+	ui.Say(fmt.Sprintf("Starting VM %s for %s...", step.name, step.descr))
 	if err := driver.Start(command...); err != nil {
-		err := fmt.Errorf("Error bringing VM up: %s", err)
+		err := fmt.Errorf("Error starting VM %s: %s", step.name, err)
 		state.Put("error", err)
 		ui.Error(err.Error())
 		return multistep.ActionHalt
 	}
 
+	vmid := driver.GetVMId(step.name)
+	hostIP, err := driver.GetTapIPAddress(vmid)
+	if err != nil {
+		state.Put("error", fmt.Errorf("Error getting hostIP: %s", err))
+		return multistep.ActionHalt
+	}
+	vmIP := net.ParseIP(hostIP).To4()
+	vmIP[3]++
+	log.Printf("VM ID: %s", vmid)
+	log.Printf("Host IP: %s", hostIP)
+	log.Printf("VM IP: %s", vmIP.String())
+	state.Put("step_descr", step.descr)
+	state.Put("vm_id", vmid)
+	state.Put("host_ip", hostIP)
+	state.Put("ssh_host", vmIP.String())
+
 	return multistep.ActionContinue
 }
 
-func (step *stepLaunchVM) Cleanup(state multistep.StateBag) {
+func (step *stepStartVM) Cleanup(state multistep.StateBag) {
 	driver := state.Get("driver").(Driver)
 	ui := state.Get("ui").(packer.Ui)
 
 	if err := driver.Stop(step.name); err != nil {
-		e := fmt.Errorf("stopping vm (%s): %v", step.name, err)
-		state.Put("error", e)
-		ui.Error(e.Error())
+		err := fmt.Errorf("Error stopping VM (%s): %v", step.name, err)
+		state.Put("error", err)
+		ui.Error(err.Error())
 	}
 }
