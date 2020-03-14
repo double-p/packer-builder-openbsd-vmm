@@ -55,7 +55,8 @@ func (d *vmmDriver) VmctlCmd(args ...string) error {
 	var stdout, stderr bytes.Buffer
 	var cmd *exec.Cmd
 	//cmd = exec.Command("ktrace", args...)
-	log.Printf("Executing vmctl: %#v", args)
+	//log.Printf("Executing vmctl: %#v", args)
+	log.Printf("Executing vmctl: vmctl %s", strings.Join(args, " "))
 	cmd = exec.Command(d.vmctl, args...)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -73,13 +74,13 @@ func (d *vmmDriver) VmctlCmd(args ...string) error {
 
 // Start the VM and create a pipe to insert commands into the VM. (from packer-builder-vmm)
 func (d *vmmDriver) Start(args ...string) error {
-	//d.ui.Message("Logging console output to " + d.logfile)
-	logFile, err := os.Create(d.logfile)
+	logFile, err := os.OpenFile(d.logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
 	}
 
-	//d.ui.Message("Executing vmctl:" + strings.Join(args, " "))
+	//log.Printf("Executing vmctl: %#v", args)
+	log.Printf("Executing vmctl: vmctl %s", strings.Join(args, " "))
 
 	cmd := exec.Command(d.vmctl, args...)
 	stdout, err := cmd.StdoutPipe()
