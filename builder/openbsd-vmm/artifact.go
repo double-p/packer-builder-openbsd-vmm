@@ -3,12 +3,11 @@ package openbsdvmm
 import (
 	"fmt"
 	"log"
-//	"os"
 )
 
 type VmmArtifact struct {
 	imageName []string
-	imageDir string
+	imageDir  string
 }
 
 func (*VmmArtifact) BuilderId() string {
