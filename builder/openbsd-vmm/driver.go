@@ -23,7 +23,6 @@ type Driver interface {
 	Stop(string) error
 	GetTapIPAddress(string) (string, error)
 	GetVMId(string) string
-	//Flush() error
 }
 
 type vmmDriver struct {
@@ -80,6 +79,9 @@ func (d *vmmDriver) Start(args ...string) error {
 	log.Printf("Executing vmctl: vmctl %s", strings.Join(args, " "))
 
 	cmd := exec.Command(d.vmctl, args...)
+	cmd.Env = append(os.Environ(),
+		"TERM=vt220",
+	)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
@@ -153,8 +155,15 @@ func (d *vmmDriver) GetTapIPAddress(id string) (string, error) {
 func (d *vmmDriver) SendKey(key rune, action bootcommand.KeyAction) error {
 	data := []byte{byte(key)}
 
-	_, err := d.tty.Write(data)
-	return err
+	if len(data) != 0 {
+		//log.Printf("Sending key '%q'", data)
+		time.Sleep(100 * time.Millisecond)
+		if _, err := d.tty.Write(data); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // SendSpecial sends a special character.
@@ -162,11 +171,19 @@ func (d *vmmDriver) SendSpecial(special string, action bootcommand.KeyAction) er
 	var data []byte
 
 	switch special {
+	case "bs":
+		data = []byte("\b")
 	case "enter":
 		data = []byte("\n")
+	case "esc":
+		data = []byte("\x1b")
+	case "tab":
+		data = []byte("\t")
 	}
 
 	if len(data) != 0 {
+		//log.Printf("Sending key '%q'", data)
+		time.Sleep(100 * time.Millisecond)
 		if _, err := d.tty.Write(data); err != nil {
 			return err
 		}
