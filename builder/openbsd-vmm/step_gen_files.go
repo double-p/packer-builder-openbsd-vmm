@@ -46,9 +46,10 @@ func (step *stepGenFiles) Run(ctx context.Context, state multistep.StateBag) mul
 	config := state.Get("config").(*Config)
 	httpPort := state.Get("http_port").(int)
 	hostIP := state.Get("host_ip").(string)
+	VMName := config.VMName
 
 	step.ctx.Data = &genFilesTemplateData{
-		config.VMName,
+		VMName,
 		hostIP,
 		httpPort,
 	}
@@ -65,7 +66,7 @@ func (step *stepGenFiles) Run(ctx context.Context, state multistep.StateBag) mul
 			return nil
 		}
 
-		matched, err := filepath.Match("*.pkr.in", fileinfo.Name())
+		matched, err := filepath.Match(VMName + "*.pkr.in", fileinfo.Name())
 
 		if matched {
 			lines, err := scanLines(path)
