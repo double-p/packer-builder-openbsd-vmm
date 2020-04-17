@@ -47,6 +47,8 @@ func (step *stepGenFiles) Run(ctx context.Context, state multistep.StateBag) mul
 	httpPort := state.Get("http_port").(int)
 	hostIP := state.Get("host_ip").(string)
 	VMName := config.VMName
+	GenFilesExtension := config.GenFilesExtension
+	GenFilesPattern := config.GenFilesPattern
 
 	step.ctx.Data = &genFilesTemplateData{
 		VMName,
@@ -66,7 +68,7 @@ func (step *stepGenFiles) Run(ctx context.Context, state multistep.StateBag) mul
 			return nil
 		}
 
-		matched, err := filepath.Match(VMName + "*.pkr.in", fileinfo.Name())
+		matched, err := filepath.Match(GenFilesPattern + "*." + GenFilesExtension, fileinfo.Name())
 
 		if matched {
 			lines, err := scanLines(path)
@@ -75,7 +77,7 @@ func (step *stepGenFiles) Run(ctx context.Context, state multistep.StateBag) mul
 				return err
 			}
 
-			newfile, err := os.OpenFile(strings.TrimSuffix(path, ".pkr.in"), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+			newfile, err := os.OpenFile(strings.TrimSuffix(path, "." + GenFilesExtension), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 			if err != nil {
 				state.Put("error", fmt.Errorf("Error writing output file: %s", err))
 				return err

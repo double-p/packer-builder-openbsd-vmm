@@ -78,6 +78,8 @@ type FlatConfig struct {
 	LogDir                    *string           `mapstructure:"log_directory" cty:"log_directory"`
 	OutDir                    *string           `mapstructure:"output_directory" cty:"output_directory"`
 	UserData                  *string           `mapstructure:"user_data" cty:"user_data"`
+	GenFilesExtension         *string           `mapstructure:"gen_files_extension" cty:"gen_files_extension"`
+	GenFilesPattern           *string           `mapstructure:"gen_files_pattern" cty:"gen_files_pattern"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -161,6 +163,8 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"log_directory":                &hcldec.AttrSpec{Name: "log_directory", Type: cty.String, Required: false},
 		"output_directory":             &hcldec.AttrSpec{Name: "output_directory", Type: cty.String, Required: false},
 		"user_data":                    &hcldec.AttrSpec{Name: "user_data", Type: cty.String, Required: false},
+		"gen_files_extension":          &hcldec.AttrSpec{Name: "gen_files_extension", Type: cty.String, Required: false},
+		"gen_files_pattern":            &hcldec.AttrSpec{Name: "gen_files_pattern", Type: cty.String, Required: false},
 	}
 	return s
 }

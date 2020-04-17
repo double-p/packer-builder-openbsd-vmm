@@ -17,6 +17,7 @@ import (
 const (
 	_DISK_QCOW2 = "qcow2"
 	_DISK_RAW   = "raw"
+	_GENFILES_DEFAULT_EXT = "pkr.in"
 )
 
 type Config struct {
@@ -41,6 +42,9 @@ type Config struct {
 	LogDir   string `mapstructure:"log_directory"`
 	OutDir   string `mapstructure:"output_directory"`
 	UserData string `mapstructure:"user_data"`
+
+	GenFilesExtension string `mapstructure:"gen_files_extension"`
+	GenFilesPattern string `mapstructure:"gen_files_pattern"`
 
 	ctx interpolate.Context
 }
@@ -79,6 +83,14 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	if c.OutDir == "" {
 		errs = packer.MultiErrorAppend(errs,
 			fmt.Errorf("Output directory must be specified (var: output_directory)"))
+	}
+
+	if c.GenFilesExtension == "" {
+		c.GenFilesExtension = _GENFILES_DEFAULT_EXT
+	}
+
+	if c.GenFilesPattern == "" {
+		c.GenFilesPattern = c.VMName
 	}
 
 	switch c.DiskFormat {
