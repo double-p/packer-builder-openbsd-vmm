@@ -91,6 +91,11 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 			fmt.Errorf("Unsupported disk_format name: "+c.DiskFormat+", must be either raw or qcow2"))
 	}
 
+	if c.DiskBase == "" && c.DiskSize == "" {
+		errs = packer.MultiErrorAppend(errs,
+			fmt.Errorf("Disk size must be specified when not using base image (var: disk_size)"))
+	}
+
 	if c.DiskBase != "" && c.DiskFormat != _DISK_QCOW2 {
 		errs = packer.MultiErrorAppend(errs,
 			fmt.Errorf("Cannot use "+c.DiskFormat+" with base image, only qcow2 format is supported"))
