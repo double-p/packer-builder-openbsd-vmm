@@ -114,9 +114,9 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 				fmt.Errorf("Only one SSH authentication method is supported (vars: ssh_agent_auth, ssh_password, ssh_private_key_file)"))
 
 		}
-	} else {
+	} else if c.CommConfig.Type != "none" {
 		errs = packer.MultiErrorAppend(errs,
-			fmt.Errorf("Only ssh communicator is supported (var: communicator)"))
+			fmt.Errorf("Only ssh or none communicator is supported (var: communicator)"))
 	}
 
 	if errs != nil && len(errs.Errors) > 0 {
