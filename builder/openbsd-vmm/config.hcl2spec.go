@@ -67,7 +67,6 @@ type FlatConfig struct {
 	WinRMUseNTLM              *bool             `mapstructure:"winrm_use_ntlm" cty:"winrm_use_ntlm"`
 	VMName                    *string           `mapstructure:"vm_name" required:"true" cty:"vm_name"`
 	VMTemplate                *string           `mapstructure:"vm_template" required:"true" cty:"vm_template"`
-	Console                   *bool             `mapstructure:"console" cty:"console"`
 	BootDevice                *string           `mapstructure:"boot_device" cty:"boot_device"`
 	Boot                      *string           `mapstructure:"boot" cty:"boot"`
 	CdRom                     *string           `mapstructure:"cdrom" cty:"cdrom"`
@@ -152,7 +151,6 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"winrm_use_ntlm":               &hcldec.AttrSpec{Name: "winrm_use_ntlm", Type: cty.Bool, Required: false},
 		"vm_name":                      &hcldec.AttrSpec{Name: "vm_name", Type: cty.String, Required: false},
 		"vm_template":                  &hcldec.AttrSpec{Name: "vm_template", Type: cty.String, Required: false},
-		"console":                      &hcldec.AttrSpec{Name: "console", Type: cty.Bool, Required: false},
 		"boot_device":                  &hcldec.AttrSpec{Name: "boot_device", Type: cty.String, Required: false},
 		"boot":                         &hcldec.AttrSpec{Name: "boot", Type: cty.String, Required: false},
 		"cdrom":                        &hcldec.AttrSpec{Name: "cdrom", Type: cty.String, Required: false},
