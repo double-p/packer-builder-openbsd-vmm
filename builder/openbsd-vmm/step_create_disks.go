@@ -24,12 +24,14 @@ func (step *stepCreateDisks) Run(ctx context.Context, state multistep.StateBag) 
 
 	command := []string{
 		"create",
-		"-s",
-		step.size,
 	}
 	if step.baseImage != "" {
 		command = append(command,
 			"-b", step.baseImage,
+		)
+	} else {
+		command = append(command,
+			"-s", step.size,
 		)
 	}
 	command = append(command,

@@ -17,6 +17,7 @@ import (
 const (
 	_DISK_QCOW2 = "qcow2"
 	_DISK_RAW   = "raw"
+	_GENFILES_DEFAULT_EXT = "pkr.in"
 )
 
 type Config struct {
@@ -41,6 +42,9 @@ type Config struct {
 	LogDir   string `mapstructure:"log_directory"`
 	OutDir   string `mapstructure:"output_directory"`
 	UserData string `mapstructure:"user_data"`
+
+	GenFilesExtension string `mapstructure:"gen_files_extension"`
+	GenFilesPattern string `mapstructure:"gen_files_pattern"`
 
 	ctx interpolate.Context
 }
@@ -81,6 +85,14 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 			fmt.Errorf("Output directory must be specified (var: output_directory)"))
 	}
 
+	if c.GenFilesExtension == "" {
+		c.GenFilesExtension = _GENFILES_DEFAULT_EXT
+	}
+
+	if c.GenFilesPattern == "" {
+		c.GenFilesPattern = c.VMName
+	}
+
 	switch c.DiskFormat {
 	case _DISK_RAW, _DISK_QCOW2:
 	// use default raw format if not specified
@@ -89,6 +101,11 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 	default:
 		errs = packer.MultiErrorAppend(errs,
 			fmt.Errorf("Unsupported disk_format name: "+c.DiskFormat+", must be either raw or qcow2"))
+	}
+
+	if c.DiskBase == "" && c.DiskSize == "" {
+		errs = packer.MultiErrorAppend(errs,
+			fmt.Errorf("Disk size must be specified when not using base image (var: disk_size)"))
 	}
 
 	if c.DiskBase != "" && c.DiskFormat != _DISK_QCOW2 {
@@ -114,9 +131,9 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 				fmt.Errorf("Only one SSH authentication method is supported (vars: ssh_agent_auth, ssh_password, ssh_private_key_file)"))
 
 		}
-	} else {
+	} else if c.CommConfig.Type != "none" {
 		errs = packer.MultiErrorAppend(errs,
-			fmt.Errorf("Only ssh communicator is supported (var: communicator)"))
+			fmt.Errorf("Only ssh or none communicator is supported (var: communicator)"))
 	}
 
 	if errs != nil && len(errs.Errors) > 0 {

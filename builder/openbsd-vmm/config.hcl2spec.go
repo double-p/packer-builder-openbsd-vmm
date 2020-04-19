@@ -44,6 +44,7 @@ type FlatConfig struct {
 	SSHBastionAgentAuth       *bool             `mapstructure:"ssh_bastion_agent_auth" cty:"ssh_bastion_agent_auth"`
 	SSHBastionUsername        *string           `mapstructure:"ssh_bastion_username" cty:"ssh_bastion_username"`
 	SSHBastionPassword        *string           `mapstructure:"ssh_bastion_password" cty:"ssh_bastion_password"`
+	SSHBastionInteractive     *bool             `mapstructure:"ssh_bastion_interactive" cty:"ssh_bastion_interactive"`
 	SSHBastionPrivateKeyFile  *string           `mapstructure:"ssh_bastion_private_key_file" cty:"ssh_bastion_private_key_file"`
 	SSHFileTransferMethod     *string           `mapstructure:"ssh_file_transfer_method" cty:"ssh_file_transfer_method"`
 	SSHProxyHost              *string           `mapstructure:"ssh_proxy_host" cty:"ssh_proxy_host"`
@@ -77,6 +78,8 @@ type FlatConfig struct {
 	LogDir                    *string           `mapstructure:"log_directory" cty:"log_directory"`
 	OutDir                    *string           `mapstructure:"output_directory" cty:"output_directory"`
 	UserData                  *string           `mapstructure:"user_data" cty:"user_data"`
+	GenFilesExtension         *string           `mapstructure:"gen_files_extension" cty:"gen_files_extension"`
+	GenFilesPattern           *string           `mapstructure:"gen_files_pattern" cty:"gen_files_pattern"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -126,6 +129,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"ssh_bastion_agent_auth":       &hcldec.AttrSpec{Name: "ssh_bastion_agent_auth", Type: cty.Bool, Required: false},
 		"ssh_bastion_username":         &hcldec.AttrSpec{Name: "ssh_bastion_username", Type: cty.String, Required: false},
 		"ssh_bastion_password":         &hcldec.AttrSpec{Name: "ssh_bastion_password", Type: cty.String, Required: false},
+		"ssh_bastion_interactive":      &hcldec.AttrSpec{Name: "ssh_bastion_interactive", Type: cty.Bool, Required: false},
 		"ssh_bastion_private_key_file": &hcldec.AttrSpec{Name: "ssh_bastion_private_key_file", Type: cty.String, Required: false},
 		"ssh_file_transfer_method":     &hcldec.AttrSpec{Name: "ssh_file_transfer_method", Type: cty.String, Required: false},
 		"ssh_proxy_host":               &hcldec.AttrSpec{Name: "ssh_proxy_host", Type: cty.String, Required: false},
@@ -159,6 +163,8 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"log_directory":                &hcldec.AttrSpec{Name: "log_directory", Type: cty.String, Required: false},
 		"output_directory":             &hcldec.AttrSpec{Name: "output_directory", Type: cty.String, Required: false},
 		"user_data":                    &hcldec.AttrSpec{Name: "user_data", Type: cty.String, Required: false},
+		"gen_files_extension":          &hcldec.AttrSpec{Name: "gen_files_extension", Type: cty.String, Required: false},
+		"gen_files_pattern":            &hcldec.AttrSpec{Name: "gen_files_pattern", Type: cty.String, Required: false},
 	}
 	return s
 }
