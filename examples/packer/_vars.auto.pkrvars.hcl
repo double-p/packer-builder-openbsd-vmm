@@ -1,0 +1,11 @@
+# default variables for all builds
+boot_wait                          = "10s"
+communicator                       = "ssh"
+disk_format                        = "qcow2"
+http_directory                     = "/home/packer_user/.config/packer/_http"
+log_directory                      = "/home/packer_user/.log/packer"
+output_directory                   = "/home/_vmd"
+shutdown_command                   = "/sbin/halt -p"
+ssh_agent_auth                     = "true"
+ssh_username                       = "root"
+vm_template                        = "generic"

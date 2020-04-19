@@ -1,0 +1,18 @@
+switch "local" {
+	interface bridge0
+}
+
+vm generic {
+	disable
+	owner packer_user
+	allow instance { boot, cdrom, disk, instance, interface, memory }
+	memory 1G
+	disk /dev/null
+}
+
+#vm generic instance dev {
+#	disable
+#	memory 4G
+#	disk /home/_vmd/openbsd-dev.qcow2
+#	interface tap { switch "local" }
+#}
