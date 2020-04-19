@@ -18,9 +18,6 @@ Still some mad regexp about how to the find the connected tap(4) interface
 
 If you find something, please use ``make vmb'' and include the log.
 
-## ports(7)
-A ports Makefile is under development and might pop up with 6.7 latest.
-
 # Remarks
 This is heavily based on https://github.com/m110/packer-builder-hcloud and
 https://github.com/prep/packer-builder-vmm
