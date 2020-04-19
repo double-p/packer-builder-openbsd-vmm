@@ -1,0 +1,12 @@
+vmd_local_prefix = "100.64.0.0/10"
+vmd_dns = "100.64.0.1"
+
+set skip on vether0
+
+match out on egress inet from $vmd_local_prefix to any nat-to (egress:0)
+
+pass in quick on tap inet proto tcp from $vmd_local_prefix to any port domain rdr-to $vmd_dns port domain
+pass in quick on tap inet proto udp from $vmd_local_prefix to any port domain rdr-to $vmd_dns port domain
+pass out
+
+block in log

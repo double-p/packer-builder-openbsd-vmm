@@ -1,0 +1,32 @@
+# Use US layout with US variant
+KEYMAPOPTS="us us"
+
+# Set hostname to {{ .VMName }}
+HOSTNAMEOPTS="-n {{ .VMName }}"
+
+# Contents of /etc/network/interfaces
+INTERFACESOPTS="auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+    hostname {{ .VMName }}
+"
+
+# Set timezone to UTC
+TIMEZONEOPTS="-z Europe/Moscow"
+
+# set http/ftp proxy
+PROXYOPTS="none"
+
+# Use dl-cdn.alpinelinux.org
+APKREPOSOPTS="-1"
+
+# Install Openssh
+SSHDOPTS="-c openssh"
+
+# Use chrony
+NTPOPTS="-c chrony"
+
+# Use /dev/vda as system disk, disable swap
+DISKOPTS="-s 0 -m sys /dev/vda"

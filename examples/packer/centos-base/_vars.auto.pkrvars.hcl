@@ -1,0 +1,1 @@
+../_vars.auto.pkrvars.hcl

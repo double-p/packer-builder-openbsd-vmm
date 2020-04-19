@@ -1,0 +1,78 @@
+text
+skipx
+cdrom
+
+lang en_US.UTF-8
+keyboard us
+timezone Europe/Moscow --utc
+
+network --hostname={{ .VMName }} --onboot yes --bootproto dhcp --noipv6 --activate
+firewall --enabled --service=ssh
+
+zerombr
+clearpart --all --initlabel
+autopart --type=lvm
+bootloader --append="console=ttyS0,115200 no_timer_check net.ifnames=0" --location=mbr
+
+auth --enableshadow --passalgo=sha512 --kickstart
+rootpw packer
+user --name=p --uid 1001 --gid 1001 --groups=wheel --plaintext --password packer
+
+selinux --permissive
+services --disabled=kdump --enabled=chronyd,rsyslog,sshd
+
+firstboot --disabled
+reboot
+
+%post --erroronfail
+dnf clean all
+dnf update -y
+sed -i /^HWADDR=.*/d /etc/sysconfig/network-scripts/ifcfg-eth0
+mkdir -m 700 /root/.ssh
+curl http://{{ .HTTPIP }}:{{ .HTTPPort }}/authorized_keys -o /root/.ssh/authorized_keys
+chmod 600 /root/.ssh/authorized_keys
+restorecon -R /root/.ssh/
+%end
+
+%packages --excludedocs
+@core
+NetworkManager
+chrony
+curl
+dnf-utils
+dracut-config-generic
+firewalld
+grub2
+kernel
+net-tools
+openssh-clients
+rsync
+sudo
+tar
+vim
+wget
+-biosdevname
+-dracut-config-rescue
+-iprutils
+-irqbalance
+-iwl100-firmware
+-iwl1000-firmware
+-iwl105-firmware
+-iwl135-firmware
+-iwl2000-firmware
+-iwl2030-firmware
+-iwl3160-firmware
+-iwl3945-firmware
+-iwl4965-firmware
+-iwl5000-firmware
+-iwl5150-firmware
+-iwl6000-firmware
+-iwl6000g2a-firmware
+-iwl6050-firmware
+-iwl7260-firmware
+-plymouth
+-trousers
+%end
+
+%addon com_redhat_kdump --disable
+%end

@@ -1,0 +1,2 @@
+inet 100.64.0.1 255.192.0.0 NONE
+!ifconfig bridge0 add \$if up

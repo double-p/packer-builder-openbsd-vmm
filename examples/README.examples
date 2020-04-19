@@ -1,0 +1,47 @@
+To test/use example templates located in packer folder:
+
+1. Configure vmd(8), httpd(8), unbound(8) and pf(4) appropriately.
+
+DNS queries from VMs are redirected using pf(4) to host's unbound(8) which also
+serves serves "local." DNS zone. Host's httpd(8) serves OpenBSD installation
+files and packages and is available for VMs as at http://openbsd.local.
+
+Both httpd(8) and unbound(8) are configured to listen on vether0 (100.64.0.1/10).
+
+Packer dynamically creates VM instances using parent VM template defined in
+vm.conf(5). Example templates use VM "generic" as parent VM template and
+"packer_user" as template owner and packer builder account, change it to your
+preference.
+
+2. Create directories for ISO images, packer templates, logs and output:
+
+	# mkdir /home/_vmd/_iso
+	# chown -R packer_user /home/_vmd
+
+	$ mkdir -p ~/.config/packer
+	$ mkdir -p ~/.log/packer
+
+and set your environment, see packer.env.sample
+
+3. Download/copy/check required ISO images and installation files to configured
+locations.
+
+4. Copy Packer templates to $PACKER_CONFIG_DIR:
+
+	$ cp -R packer/* $PACKER_CONFIG_DIR
+
+5. Check templates configuration, change vars where necessary (paths, ssh_user,
+etc). Note that common vars are defined/set in $PACKER_CONFIG_DIR/*.hcl files
+and symlinked from each template direcrory. OS/build-specific variables are set
+in template's pkr.hcl config.
+
+6. Check/edit _http/* autoinstall templates; copy your authorized_keys file
+to $PACKER_CONFIG_DIR/_http.
+
+7. Run packer:
+
+	$ cd $PACKER_CONFIG_DIR
+	$ packer build alpine-base
+	$ packer build centos-base
+	$ packer build openbsd-base
+	$ packer build openbsd-dev

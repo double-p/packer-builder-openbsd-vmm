@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	_DISK_QCOW2 = "qcow2"
-	_DISK_RAW   = "raw"
+	_DISK_QCOW2           = "qcow2"
+	_DISK_RAW             = "raw"
 	_GENFILES_DEFAULT_EXT = "pkr.in"
 )
 
@@ -30,7 +30,6 @@ type Config struct {
 
 	VMName     string `mapstructure:"vm_name"      required:"true"`
 	VMTemplate string `mapstructure:"vm_template"  required:"true"` // vmctl -t
-	Console    bool   `mapstructure:"console"`                      // vmctl -c
 	BootDevice string `mapstructure:"boot_device"`                  // vmctl -B
 	Boot       string `mapstructure:"boot"`                         // vmctl -b
 	CdRom      string `mapstructure:"cdrom"`                        // vmctl -r
@@ -44,7 +43,7 @@ type Config struct {
 	UserData string `mapstructure:"user_data"`
 
 	GenFilesExtension string `mapstructure:"gen_files_extension"`
-	GenFilesPattern string `mapstructure:"gen_files_pattern"`
+	GenFilesPattern   string `mapstructure:"gen_files_pattern"`
 
 	ctx interpolate.Context
 }

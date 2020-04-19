@@ -1,0 +1,2 @@
+local-data: "openbsd.local.	IN A 100.64.0.1"
+local-data: "dev.local.		IN A 100.64.0.100"
