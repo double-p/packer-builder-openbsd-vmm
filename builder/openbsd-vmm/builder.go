@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 
 	"github.com/hashicorp/hcl/v2/hcldec"
-	"github.com/hashicorp/packer/common"
-	"github.com/hashicorp/packer/helper/communicator"
-	"github.com/hashicorp/packer/helper/multistep"
-	"github.com/hashicorp/packer/packer"
+	"github.com/hashicorp/packer-plugin-sdk/communicator"
+	"github.com/hashicorp/packer-plugin-sdk/multistep"
+	commonsteps "github.com/hashicorp/packer-plugin-sdk/multistep/commonsteps"
+	"github.com/hashicorp/packer-plugin-sdk/packer"
 )
 
 const BuilderID = "packer.openbsd-vmm"
@@ -77,7 +77,7 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 	)
 
 	steps = append(steps,
-		&common.StepHTTPServer{
+		&commonsteps.StepHTTPServer{
 			HTTPDir:     b.config.HTTPDir,
 			HTTPPortMin: b.config.HTTPPortMin,
 			HTTPPortMax: b.config.HTTPPortMax,
@@ -118,7 +118,7 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 	)
 
 	steps = append(steps,
-		&common.StepProvision{},
+		&commonsteps.StepProvision{},
 	)
 
 	steps = append(steps,
@@ -126,9 +126,9 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 	)
 
 	// Run; step-wise if -debug/-on-error=ask
-	b.runner = common.NewRunner(steps, b.config.PackerConfig, ui)
+	b.runner = commonsteps.NewRunner(steps, b.config.PackerConfig, ui)
 	if b.config.PackerDebug {
-		b.runner = common.NewRunnerWithPauseFn(steps, b.config.PackerConfig, ui, state)
+		b.runner = commonsteps.NewRunnerWithPauseFn(steps, b.config.PackerConfig, ui, state)
 	}
 	b.runner.Run(ctx, state)
 

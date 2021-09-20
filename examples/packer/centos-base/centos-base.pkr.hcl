@@ -1,12 +1,11 @@
 #
 source "openbsd-vmm" "centos-base" {
-    vm_name                        = "centos-base-{{ isotime \"2006-01-02\" }}"
-    vm_template                    = var.vm_template
-    disk_format                    = var.disk_format
+    vm_name                        = "centos-base"
+    vm_template                    = "generic"
+    disk_format                    = "qcow2"
     disk_size                      = "20G"
-    boot_device                    = "cdrom"
-    cdrom                          = "/home/_vmd/_iso/CentOS-8.1.1911-x86_64-dvd1.iso"
-    boot_wait                      = var.boot_wait
+    cdrom                          = "/home/_vmd/_iso/CentOS-Stream-8-x86_64-20210907-dvd1.iso"
+    boot_wait                      = "5s"
     boot_command                   = [
         "<esc><wait2>",
         "vmlinuz",
@@ -18,21 +17,22 @@ source "openbsd-vmm" "centos-base" {
 	" net.ifnames=0",
 	" modprobe.blacklist=intel_pmc_core",
 	" ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos.autoinstall",
+	" ipv6.disable=1",
 	"<enter>"
     ]
 
     gen_files_pattern              = "centos"
 
-    communicator                   = var.communicator
-    ssh_agent_auth                 = var.ssh_agent_auth
+    communicator                   = "centos"
+    ssh_agent_auth                 = "ssh"
     ssh_timeout                    = "1h"
-    ssh_username                   = var.ssh_username
+    ssh_username                   = packer
 
-    shutdown_command               = var.shutdown_command
+    shutdown_command               = "sudo /sbin/halt -p"
 
-    http_directory                 = var.http_directory
-    log_directory                  = var.log_directory
-    output_directory               = var.output_directory
+    http_directory                 = "./_http"
+    log_directory                  = "${var.home}/.log/packer"
+    output_directory               = "/home/_vmd"
 }
 
 build {

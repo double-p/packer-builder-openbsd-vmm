@@ -4,6 +4,7 @@ switch "local" {
 
 vm generic {
 	disable
+	boot device cdrom
 	owner packer_user
 	allow instance { boot, cdrom, disk, instance, interface, memory }
 	memory 1G
@@ -12,7 +13,7 @@ vm generic {
 
 #vm generic instance dev {
 #	disable
-#	memory 4G
+#	memory 2G
 #	disk /home/_vmd/openbsd-dev.qcow2
 #	interface tap { switch "local" }
 #}

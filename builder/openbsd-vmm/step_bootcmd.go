@@ -6,38 +6,41 @@ import (
 	"log"
 	"time"
 
-	"github.com/hashicorp/packer/common"
-	"github.com/hashicorp/packer/common/bootcommand"
-	"github.com/hashicorp/packer/helper/multistep"
-	"github.com/hashicorp/packer/packer"
-	"github.com/hashicorp/packer/template/interpolate"
+	"github.com/hashicorp/packer-plugin-sdk/bootcommand"
+	"github.com/hashicorp/packer-plugin-sdk/multistep"
+	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
+	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
 )
 
 type stepBootCmd struct {
 	cmd      string
 	BootWait time.Duration
+	VMName   string
 	ctx      interpolate.Context
 }
 
 type bootCommandTemplateData struct {
 	HTTPIP   string
 	HTTPPort int
+	Name     string
 }
 
 func (step *stepBootCmd) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	config := state.Get("config").(*Config)
 	driver := state.Get("driver").(Driver)
-	ui := state.Get("ui").(packer.Ui)
+	ui := state.Get("ui").(packersdk.Ui)
 
 	step_descr := state.Get("step_descr").(string)
 	httpPort := state.Get("http_port").(int)
 	hostIP := state.Get("host_ip").(string)
 
 	log.Printf("HTTP IP/port: %s:%d", hostIP, httpPort)
-	common.SetHTTPIP(hostIP)
+
+	state.Put("http_ip", hostIP)
 	step.ctx.Data = &bootCommandTemplateData{
 		hostIP,
 		httpPort,
+		step.VMName,
 	}
 
 	if int64(step.BootWait) > 0 {

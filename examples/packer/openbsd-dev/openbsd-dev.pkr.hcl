@@ -1,11 +1,11 @@
 #
 source "openbsd-vmm" "openbsd-dev" {
     vm_name                        = "openbsd-dev"
-    vm_template                    = var.vm_template
+    vm_template                    = "generic"
     memory                         = "2G"
-    disk_base                      = "/home/_vmd/openbsd-base-2020-04-19.qcow2"
-    disk_format                    = var.disk_format
-    boot_wait                      = var.boot_wait
+    disk_base                      = "/home/_vmd/openbsd-base.qcow2"
+    disk_format                    = "qcow2"
+    boot_wait                      = "5s"
     boot_command                   = [
         "<enter>",
         "mount -a -t ffs",
@@ -20,29 +20,29 @@ source "openbsd-vmm" "openbsd-dev" {
         "<enter>"
     ]
 
-    ssh_agent_auth                 = var.ssh_agent_auth
+    ssh_agent_auth                 = "ssh"
+    ssh_agent_auth                 = true
     ssh_username                   = "packer"
 
     shutdown_command               = "doas /sbin/halt -p"
 
-    http_directory                 = var.http_directory
-    log_directory                  = var.log_directory
-    output_directory               = var.output_directory
+    http_directory                 = "./_http"
+    log_directory                  = "${var.home}/.log/packer"
+    output_directory               = "/home/_vmd"
 }
 
 build {
     sources                        = [ "source.openbsd-vmm.openbsd-dev" ]
+
+    # configure IP/DNS for vmm-running VM
     provisioner "shell" {
         inline = [
-            "env TRUSTED_PKG_PATH='http://openbsd.local/%c/packages/%a/all' doas pkg_add go--",
-            "touch ~/.hushlogin",
+            "sleep 30",
             "doas su root -c \"echo 'inet 100.64.0.100 255.192.0.0 NONE' > /etc/hostname.vio0\"",
             "doas su root -c \"echo 'nameserver 100.64.0.1' > /etc/resolv.conf\"",
             "doas su root -c \"echo 'lookup file bind' >> /etc/resolv.conf\"",
-            "doas su root -c \"echo 'search local my.domain' >> /etc/resolv.conf\"",
-            "doas su root -c \"echo '100.64.0.1' > /etc/mygate\"",
-            "doas rm /etc/resolv.conf.tail",
-            "doas install -c -o root -g wheel -m 664 /dev/null /etc/motd"
+            "doas su root -c \"echo 'search local' >> /etc/resolv.conf\"",
+            "doas su root -c \"echo '100.64.0.1' > /etc/mygate\""
         ]
     }
 }
