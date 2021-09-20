@@ -3,8 +3,8 @@ server "openbsd.local" {
   log style combined
   root "/htdocs/openbsd"
   location "/snapshots/amd64/" { directory auto index }
+  location "/snapshots/packages/amd64/" { directory auto index }
   location "/snapshots/packages/amd64/all/" { directory auto index }
-  location "/snapshots/amd64/SHA256.sig" { no log }
 }
 
 types { include "/usr/share/misc/mime.types" }

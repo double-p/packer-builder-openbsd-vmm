@@ -1,6 +1,6 @@
 /		256M
-/usr		  2G
-/usr/local	  1G
+/usr		  4G
+/usr/local	  4G
 /tmp		  1G
-/home		  2G
+/home		  6G
 /var		  1G-*

@@ -4,42 +4,47 @@ cdrom
 
 lang en_US.UTF-8
 keyboard us
-timezone Europe/Moscow --utc
+timezone Europe/Moscow --utc --ntpservers=_gateway
 
-network --hostname={{ .VMName }} --onboot yes --bootproto dhcp --noipv6 --activate
+network --hostname=centos --onboot yes --bootproto dhcp --noipv6 --activate
 firewall --enabled --service=ssh
 
 zerombr
 clearpart --all --initlabel
 autopart --type=lvm
-bootloader --append="console=ttyS0,115200 no_timer_check net.ifnames=0" --location=mbr
+bootloader --append="console=ttyS0,115200 no_timer_check net.ifnames=0 clocksource_failover=acpi_pm" --location=mbr
 
-auth --enableshadow --passalgo=sha512 --kickstart
+authselect --useshadow --passalgo sha512
 rootpw packer
-user --name=p --uid 1001 --gid 1001 --groups=wheel --plaintext --password packer
+user --name=packer --uid 1001 --gid 1001 --groups=wheel --plaintext --password packer
 
 selinux --permissive
 services --disabled=kdump --enabled=chronyd,rsyslog,sshd
 
 firstboot --disabled
-reboot
+poweroff
 
-%post --erroronfail
+%post --log=/var/log/anaconda/post-install.log --erroronfail
 dnf clean all
 dnf update -y
 sed -i /^HWADDR=.*/d /etc/sysconfig/network-scripts/ifcfg-eth0
+
 mkdir -m 700 /root/.ssh
 curl http://{{ .HTTPIP }}:{{ .HTTPPort }}/authorized_keys -o /root/.ssh/authorized_keys
 chmod 600 /root/.ssh/authorized_keys
 restorecon -R /root/.ssh/
+cp -R /root/.ssh /home/packer
+chown -R packer.packer /home/p/.ssh
+echo "packer ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/packer
 %end
 
 %packages --excludedocs
 @core
 NetworkManager
+centos-gpg-keys
+centos-stream-repos
 chrony
 curl
-dnf-utils
 dracut-config-generic
 firewalld
 grub2
@@ -51,10 +56,6 @@ sudo
 tar
 vim
 wget
--biosdevname
--dracut-config-rescue
--iprutils
--irqbalance
 -iwl100-firmware
 -iwl1000-firmware
 -iwl105-firmware
@@ -70,8 +71,6 @@ wget
 -iwl6000g2a-firmware
 -iwl6050-firmware
 -iwl7260-firmware
--plymouth
--trousers
 %end
 
 %addon com_redhat_kdump --disable
