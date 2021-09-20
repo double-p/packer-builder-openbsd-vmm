@@ -4,7 +4,7 @@ import (
 	"log"
 
 	vmm "github.com/double-p/packer-builder-openbsd-vmm/builder/openbsd-vmm"
-	"github.com/hashicorp/packer/packer/plugin"
+	"github.com/hashicorp/packer-plugin-sdk/plugin"
 )
 
 func main() {

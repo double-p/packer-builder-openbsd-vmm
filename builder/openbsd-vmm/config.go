@@ -5,13 +5,14 @@ package openbsdvmm
 import (
 	"fmt"
 
-	"github.com/hashicorp/packer/common"
-	"github.com/hashicorp/packer/common/bootcommand"
-	"github.com/hashicorp/packer/common/shutdowncommand"
-	"github.com/hashicorp/packer/helper/communicator"
-	"github.com/hashicorp/packer/helper/config"
-	"github.com/hashicorp/packer/packer"
-	"github.com/hashicorp/packer/template/interpolate"
+	"github.com/hashicorp/packer-plugin-sdk/bootcommand"
+	common "github.com/hashicorp/packer-plugin-sdk/common"
+	"github.com/hashicorp/packer-plugin-sdk/communicator"
+	commonsteps "github.com/hashicorp/packer-plugin-sdk/multistep/commonsteps"
+	"github.com/hashicorp/packer-plugin-sdk/packer"
+	"github.com/hashicorp/packer-plugin-sdk/shutdowncommand"
+	"github.com/hashicorp/packer-plugin-sdk/template/config"
+	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
 )
 
 const (
@@ -22,7 +23,7 @@ const (
 
 type Config struct {
 	common.PackerConfig            `mapstructure:",squash"`
-	common.HTTPConfig              `mapstructure:",squash"`
+	commonsteps.HTTPConfig         `mapstructure:",squash"`
 	bootcommand.BootConfig         `mapstructure:",squash"`
 	shutdowncommand.ShutdownConfig `mapstructure:",squash"`
 

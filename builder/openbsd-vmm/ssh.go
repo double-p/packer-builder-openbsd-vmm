@@ -1,7 +1,7 @@
 package openbsdvmm
 
 import (
-	"github.com/hashicorp/packer/helper/multistep"
+	"github.com/hashicorp/packer-plugin-sdk/multistep"
 )
 
 func CommHost() func(multistep.StateBag) (string, error) {
