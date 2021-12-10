@@ -6,17 +6,17 @@ import (
 )
 
 type VmmArtifact struct {
-	imageName []string
+	imageName string
 	imageDir  string
+	diskFormat string
 }
 
 func (*VmmArtifact) BuilderId() string {
 	return BuilderID
 }
 
-// who needs this?
 func (a *VmmArtifact) Files() []string {
-	return a.imageName
+	return []string{fmt.Sprintf("%s/%s.%s", a.imageDir, a.imageName, a.diskFormat)}
 }
 
 func (a *VmmArtifact) Id() string {
