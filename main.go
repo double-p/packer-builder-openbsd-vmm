@@ -12,7 +12,7 @@ import (
 func main() {
 	pps := plugin.NewSet()
 	pps.RegisterBuilder(plugin.DEFAULT_NAME, new(vmm.Builder))
-	pps.SetVersion(version.NewPluginVersion("0.8", "", ""))
+	pps.SetVersion(version.NewPluginVersion("v1.7.4", "", ""))
 	err := pps.Run()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
