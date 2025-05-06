@@ -146,8 +146,8 @@ func (b *Builder) Run(ctx context.Context, ui packer.Ui, hook packer.Hook) (pack
 	}
 
 	artifact := &VmmArtifact{
-		imageDir:  b.config.OutDir,
-		imageName: b.config.VMName,
+		imageDir:   b.config.OutDir,
+		imageName:  b.config.VMName,
 		diskFormat: b.config.DiskFormat,
 	}
 	return artifact, nil

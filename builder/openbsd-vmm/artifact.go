@@ -6,8 +6,8 @@ import (
 )
 
 type VmmArtifact struct {
-	imageName string
-	imageDir  string
+	imageName  string
+	imageDir   string
 	diskFormat string
 }
 
