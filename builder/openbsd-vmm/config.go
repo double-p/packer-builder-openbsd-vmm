@@ -100,7 +100,7 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 		c.DiskFormat = _DISK_RAW
 	default:
 		errs = packer.MultiErrorAppend(errs,
-			fmt.Errorf("Unsupported disk_format name: "+c.DiskFormat+", must be either raw or qcow2"))
+			fmt.Errorf("Unsupported disk_format name: %s, must be either raw or qcow2", c.DiskFormat))
 	}
 
 	if c.DiskBase == "" && c.DiskSize == "" {
@@ -110,7 +110,7 @@ func (c *Config) Prepare(raws ...interface{}) ([]string, error) {
 
 	if c.DiskBase != "" && c.DiskFormat != _DISK_QCOW2 {
 		errs = packer.MultiErrorAppend(errs,
-			fmt.Errorf("Cannot use "+c.DiskFormat+" with base image, only qcow2 format is supported"))
+			fmt.Errorf("Cannot use %s with base image, only qcow2 format is supported", c.DiskFormat))
 	}
 
 	if c.CommConfig.Type == "ssh" {
