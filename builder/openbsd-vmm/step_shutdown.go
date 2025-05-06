@@ -15,14 +15,16 @@ import (
 // but ultimately forcefully shuts it down if that fails.
 //
 // Uses:
-//   communicator packer.Communicator
-//   config *config
-//   driver Driver
-//   ui     packer.Ui
-//   vm_id  string
+//
+//	communicator packer.Communicator
+//	config *config
+//	driver Driver
+//	ui     packer.Ui
+//	vm_id  string
 //
 // Produces:
-//   <nothing>
+//
+//	<nothing>
 type stepShutdown struct{}
 
 func (step *stepShutdown) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {

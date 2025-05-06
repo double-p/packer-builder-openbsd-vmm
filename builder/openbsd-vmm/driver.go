@@ -150,7 +150,7 @@ func (d *vmmDriver) GetTapIPAddress(id string) (string, error) {
 	return "", err
 }
 
-//// interface Seq requires the following, not using it so far
+// interface Seq requires the following, not using it so far
 // SendKey sends a key press.
 func (d *vmmDriver) SendKey(key rune, action bootcommand.KeyAction) error {
 	data := []byte{byte(key)}
